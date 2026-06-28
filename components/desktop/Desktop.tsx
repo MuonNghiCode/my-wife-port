@@ -27,6 +27,126 @@ function MobileClock() {
   return <span>{time}</span>
 }
 
+// Glassmorphic Clock & Date Widget for Desktop Background
+function DesktopWidgetClock() {
+  const [time, setTime] = useState('')
+  const [date, setDate] = useState('')
+  
+  useEffect(() => {
+    const update = () => {
+      const now = new Date()
+      setTime(now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false }))
+      setDate(now.toLocaleDateString('vi-VN', { weekday: 'long', month: 'long', day: 'numeric' }))
+    }
+    update()
+    const t = setInterval(update, 1000)
+    return () => clearInterval(t)
+  }, [])
+
+  return (
+    <div style={{
+      background: 'var(--bg-glass)',
+      backdropFilter: 'blur(20px)',
+      border: '1.5px solid var(--window-border)',
+      borderRadius: 24,
+      padding: '24px 28px',
+      boxShadow: 'var(--window-shadow)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 6,
+    }}>
+      <div style={{
+        fontFamily: 'var(--font-ui)',
+        fontSize: 10,
+        fontWeight: 800,
+        color: 'var(--text-muted)',
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+      }}>
+        System Time
+      </div>
+      <div style={{
+        fontSize: 40,
+        fontWeight: 200,
+        color: 'var(--text-primary)',
+        letterSpacing: '-1px',
+        lineHeight: 1.1,
+      }}>
+        {time}
+      </div>
+      <div style={{
+        fontSize: 12,
+        fontWeight: 700,
+        color: 'var(--orange-vivid)',
+        textTransform: 'capitalize',
+      }}>
+        {date}
+      </div>
+    </div>
+  )
+}
+
+// Cozy Sticky Note Widget for Desktop Background
+function DesktopStickyNote() {
+  return (
+    <motion.div
+      whileHover={{ rotate: 0, scale: 1.02 }}
+      style={{
+        background: 'var(--bg-glass)',
+        backdropFilter: 'blur(20px)',
+        border: '1.5px solid var(--window-border)',
+        borderRadius: 24,
+        padding: '24px 28px',
+        boxShadow: 'var(--window-shadow)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 14,
+        transform: 'rotate(1.5deg)',
+        transition: 'transform 0.3s ease',
+      }}
+    >
+      <div style={{
+        fontFamily: 'var(--font-ui)',
+        fontSize: 10,
+        fontWeight: 800,
+        color: 'var(--text-muted)',
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+      }}>
+        Workspace Tasks
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {[
+          { done: true, text: 'Launch brand relaunch campaign' },
+          { done: true, text: 'Influencer seeding collection' },
+          { done: false, text: 'Creative storytelling draft' },
+          { done: false, text: 'Coffee meeting with team' },
+        ].map((todo, idx) => (
+          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12 }}>
+            <div style={{
+              width: 14, height: 14, borderRadius: 4,
+              border: `1.5px solid ${todo.done ? 'var(--orange-vivid)' : 'var(--text-muted)'}`,
+              background: todo.done ? 'var(--orange-soft)' : 'transparent',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'var(--orange-vivid)', fontSize: 9, fontWeight: 900,
+              flexShrink: 0,
+            }}>
+              {todo.done && '✓'}
+            </div>
+            <span style={{
+              color: todo.done ? 'var(--text-muted)' : 'var(--text-primary)',
+              textDecoration: todo.done ? 'line-through' : 'none',
+              fontWeight: 600,
+            }}>
+              {todo.text}
+            </span>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
 export default function Desktop() {
   const { phase, setPhase } = useBootStore()
   const { windows, openWindow, restoreWindow } = useDesktopStore()
@@ -196,6 +316,25 @@ export default function Desktop() {
           }}>
             <IconGrid />
           </div>
+
+          {/* Desktop Right Side Background Widgets (Desktop only) */}
+          {!isMobile && (
+            <div style={{
+              position: 'absolute',
+              top: 50,
+              right: 60,
+              width: 280,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 24,
+              pointerEvents: 'auto',
+              zIndex: 1,
+              userSelect: 'none',
+            }}>
+              <DesktopWidgetClock />
+              <DesktopStickyNote />
+            </div>
+          )}
 
           {/* All open windows */}
           <WindowManager />

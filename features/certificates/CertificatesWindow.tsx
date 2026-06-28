@@ -1,73 +1,177 @@
 'use client'
 import { motion } from 'framer-motion'
 import { CERTIFICATES } from '@/data/portfolio'
-import { Award, ExternalLink } from 'lucide-react'
+import { Award, ExternalLink, Globe, BookOpen, Languages } from 'lucide-react'
 
 export default function CertificatesWindow() {
-  return (
-    <div style={{ padding: '20px 24px', fontFamily: 'var(--font-ui)', height: '100%', overflowY: 'auto', background: 'transparent' }}>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-        gap: 14,
-      }}>
-        {CERTIFICATES.map((cert, i) => (
-          <motion.div
-            key={cert.id}
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.07, type: 'spring', stiffness: 400, damping: 25 }}
-            whileHover={{ y: -4, boxShadow: '0 10px 20px rgba(0,0,0,0.04), 0 0 0 1px #0ea5e9' }}
-            style={{
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--window-border)',
-              borderRadius: 12, padding: 16,
-              cursor: 'none',
-              transition: 'all 0.2s',
-            }}
-          >
-            {/* Icon */}
-            <div style={{
-              width: 44, height: 44, borderRadius: 10, marginBottom: 12,
-              background: i % 3 === 0 ? 'var(--blue-soft)' : i % 3 === 1 ? 'var(--pink-soft)' : 'var(--window-bg)', /* Solid pastels */
-              border: `1px solid ${i % 3 === 0 ? 'var(--blue-bright)' : i % 3 === 1 ? 'var(--pink-bright)' : 'var(--window-border)'}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Award size={22} color={i % 3 === 0 ? 'var(--blue-vivid)' : i % 3 === 1 ? 'var(--pink-vivid)' : '#7c3aed'} />
-            </div>
+  const languageCerts = CERTIFICATES.filter(c => {
+    const n = c.name.toLowerCase()
+    return n.includes('toeic') || n.includes('hsk') || n.includes('ielts')
+  })
+  const specCerts = CERTIFICATES.filter(c => {
+    const n = c.name.toLowerCase()
+    return !(n.includes('toeic') || n.includes('hsk') || n.includes('ielts'))
+  })
 
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3, marginBottom: 6 }}>
-              {cert.name}
-            </div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4, fontWeight: 500 }}>{cert.issuer}</div>
-            <div style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              marginTop: 12,
-            }}>
-              <span style={{
-                fontFamily: 'var(--font-mono)', fontSize: 10,
-                color: 'var(--blue-vivid)', background: 'var(--blue-soft)',
-                padding: '2px 7px', borderRadius: 99, border: '1px solid var(--blue-bright)',
-                fontWeight: 600,
+  return (
+    <div style={{
+      padding: 24,
+      fontFamily: 'var(--font-ui)',
+      height: '100%',
+      overflowY: 'auto',
+      background: 'transparent',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 24,
+    }}>
+      {/* Language Proficiency Section */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <Globe size={16} color="var(--pink-vivid)" />
+          <h3 style={{
+            fontSize: 12, fontWeight: 800, color: 'var(--pink-vivid)',
+            textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0,
+          }}>
+            Language Proficiency
+          </h3>
+        </div>
+        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+          {languageCerts.map((cert, i) => (
+            <motion.div
+              key={cert.id}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08, type: 'spring', stiffness: 350, damping: 25 }}
+              whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(0,0,0,0.04), 0 0 0 1.5px var(--pink-vivid)' }}
+              style={{
+                flex: '1 1 220px',
+                background: 'var(--bg-glass)',
+                border: '1.5px solid var(--window-border)',
+                borderRadius: 18,
+                padding: 20,
+                cursor: 'none',
+                backdropFilter: 'blur(16px)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 16,
+              }}
+            >
+              <div style={{
+                width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+                background: 'var(--pink-soft)',
+                border: '1px solid var(--pink-bright)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                {cert.year}
-              </span>
-              {cert.verifyUrl && (
-                <a href={cert.verifyUrl} target="_blank" rel="noreferrer" data-cursor="pointer"
-                  style={{ color: 'var(--text-muted)', display: 'flex', transition: 'color 0.15s' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--blue-vivid)')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
-                  <ExternalLink size={13} />
-                </a>
-              )}
-            </div>
-            {cert.credentialId && (
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: '#9ca3af', marginTop: 8, fontWeight: 500 }}>
-                ID: {cert.credentialId}
+                <Languages size={22} color="var(--pink-vivid)" />
               </div>
-            )}
-          </motion.div>
-        ))}
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3 }}>
+                  {cert.name}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2, fontWeight: 500 }}>
+                  {cert.issuer}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Professional Specializations Section */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+          <BookOpen size={16} color="var(--blue-vivid)" />
+          <h3 style={{
+            fontSize: 12, fontWeight: 800, color: 'var(--blue-vivid)',
+            textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0,
+          }}>
+            Professional Specializations
+          </h3>
+        </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: 14,
+        }}>
+          {specCerts.map((cert, i) => (
+            <motion.div
+              key={cert.id}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + i * 0.07, type: 'spring', stiffness: 350, damping: 25 }}
+              whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(0,0,0,0.04), 0 0 0 1.5px var(--blue-vivid)' }}
+              style={{
+                background: 'var(--bg-glass)',
+                border: '1.5px solid var(--window-border)',
+                borderRadius: 18,
+                padding: 20,
+                cursor: 'none',
+                backdropFilter: 'blur(16px)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 12,
+              }}
+            >
+              {/* Top Row */}
+              <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                  background: 'var(--blue-soft)',
+                  border: '1px solid var(--blue-bright)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Award size={20} color="var(--blue-vivid)" />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.35 }}>
+                    {cert.name}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3, fontWeight: 500 }}>
+                    {cert.issuer}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Row */}
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                borderTop: '1px solid var(--window-border)',
+                paddingTop: 12,
+              }}>
+                <span style={{
+                  fontFamily: 'var(--font-mono)', fontSize: 11,
+                  color: 'var(--blue-vivid)', background: 'var(--blue-soft)',
+                  padding: '3px 10px', borderRadius: 99, border: '1px solid var(--blue-bright)',
+                  fontWeight: 700,
+                }}>
+                  {cert.year}
+                </span>
+                {cert.verifyUrl && (
+                  <a
+                    href={cert.verifyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    data-cursor="pointer"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 5,
+                      fontSize: 11, fontWeight: 700,
+                      color: 'var(--blue-vivid)',
+                      textDecoration: 'none',
+                      padding: '4px 10px',
+                      borderRadius: 8,
+                      background: 'var(--blue-soft)',
+                      border: '1px solid var(--blue-bright)',
+                      cursor: 'none',
+                    }}
+                  >
+                    <ExternalLink size={11} />
+                    <span>Verify</span>
+                  </a>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   )

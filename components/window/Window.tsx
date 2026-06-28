@@ -74,7 +74,8 @@ export default function Window({ window: win, children }: WindowProps) {
       style={{
         ...containerStyle,
         zIndex: win.zIndex,
-        background: 'var(--window-bg)',
+        background: 'var(--bg-glass)',
+        backdropFilter: 'blur(20px)',
         border: `1px solid ${isDragging ? 'var(--pink-vivid)' : 'var(--window-border)'}`,
         boxShadow: isDragging
           ? '0 16px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02)'

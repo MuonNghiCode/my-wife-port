@@ -1,12 +1,56 @@
 'use client'
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { Play, Pause, SkipForward, SkipBack, Volume2, VolumeX, Music, CloudRain, Flame, Bird, Sparkles } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
+import { Play, Pause, SkipForward, SkipBack, Volume2, VolumeX, Music } from 'lucide-react'
 import { useSoundStore, playSynthSound, TRACKS } from '@/store/soundStore'
 
-const visualizerBars = Array.from({ length: 18 }).map(() => ({
-  duration: 0.5 + Math.random() * 0.7,
-  maxH: 20 + Math.random() * 35,
+const visualizerBars = Array.from({ length: 24 }).map(() => ({
+  duration: 0.6 + Math.random() * 0.8,
+  maxH: 22 + Math.random() * 26,
 }))
+
+interface LyricLine {
+  time: number
+  text: string
+}
+
+const LYRICS: Record<string, LyricLine[]> = {
+  t1: [
+    { time: 0, text: "[Chill lo-fi guitar plucking]" },
+    { time: 6, text: "Can we have a coffee or something?" },
+    { time: 14, text: "Wind rustling gently through the coffee shop trees" },
+    { time: 23, text: "Soft Fender Rhodes electric piano chords join in" },
+    { time: 35, text: "A cozy, quiet evening memory of two strangers" },
+    { time: 48, text: "Soft crackling vinyl static in the background" },
+    { time: 60, text: "Humming bird sounds chirping in the garden" },
+    { time: 78, text: "The aroma of fresh coffee fills the air..." },
+    { time: 96, text: "Chords slowly repeat and fade away..." },
+    { time: 110, text: "[Instrumental outro]" }
+  ],
+  t2: [
+    { time: 0, text: "[Soft piano keys introducing the melody]" },
+    { time: 12, text: "Ryuichi Sakamoto's iconic masterpiece begins" },
+    { time: 24, text: "Violins gently enter, warming the atmosphere" },
+    { time: 42, text: "A winter breeze echoes through the strings" },
+    { time: 60, text: "The piano keys dance like snowflakes" },
+    { time: 85, text: "Emotional climax: Cello and Violin harmony" },
+    { time: 110, text: "A calm, cinematic winter evening memory" },
+    { time: 140, text: "Soft piano outro fades into silence" }
+  ],
+  t3: [
+    { time: 0, text: "[Orchestral string opening]" },
+    { time: 8, text: "For you, I could pretend like I was happy when I was sad" },
+    { time: 18, text: "For you, I could pretend like I was strong when I was hurt" },
+    { time: 28, text: "I wish love was perfect as love itself" },
+    { time: 38, text: "I wish all my weaknesses could be hidden" },
+    { time: 48, text: "I grew a flower that can't be bloomed in a dream that can't come true" },
+    { time: 58, text: "I'm so sick of this fake love, fake love, fake love" },
+    { time: 68, text: "I'm so sorry but it's fake love, fake love, fake love" },
+    { time: 78, text: "Orchestral melody builds with dramatic drums" },
+    { time: 98, text: "Love you so bad, love you so bad" },
+    { time: 108, text: "Mold a pretty lie for you..." }
+  ]
+}
 
 export default function MusicWindow() {
   const {
@@ -25,6 +69,8 @@ export default function MusicWindow() {
   } = useSoundStore()
 
   const [isMobile, setIsMobile] = useState(false)
+  const [mobileTab, setMobileTab] = useState<'lyrics' | 'queue'>('lyrics')
+  const lyricContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const checkMobile = () => {
@@ -35,185 +81,49 @@ export default function MusicWindow() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Ambient Sounds state (kept local since it runs in background when mounted but hidden)
-  const [rainVolume, setRainVolume] = useState(0)
-  const [fireVolume, setFireVolume] = useState(0)
-  const [birdVolume, setBirdVolume] = useState(0)
-
-  // Ref to hold current volume values to avoid stale closures in Web Audio intervals
-  const volumesRef = useRef({ rainVolume, fireVolume, birdVolume })
-  useEffect(() => {
-    volumesRef.current = { rainVolume, fireVolume, birdVolume }
-  }, [rainVolume, fireVolume, birdVolume])
-
-  // Web Audio Context for synthesized ambient noise
-  const audioCtxRef = useRef<AudioContext | null>(null)
-  const rainGainRef = useRef<GainNode | null>(null)
-  const fireGainRef = useRef<GainNode | null>(null)
-  const birdGainRef = useRef<GainNode | null>(null)
-
-  const currentTrack = TRACKS[currentTrackIdx]
-
-  // Initialize audio when window mounts
   useEffect(() => {
     initAudioIfNeeded()
   }, [initAudioIfNeeded])
 
-  // Extended interface for AudioContext to track active intervals
-  interface ExtendedAudioContext extends AudioContext {
-    intervals?: NodeJS.Timeout[]
-  }
+  const currentTrack = TRACKS[currentTrackIdx]
+  const trackLyrics = LYRICS[currentTrack.id] || []
 
-  // Initialize Web Audio API for Ambient Synthesizer
-  const initAmbientSynth = useCallback(() => {
-    if (audioCtxRef.current) return
-    const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
-    if (!AudioContextClass) return
+  // Find active lyric index
+  const activeLyricIdx = trackLyrics.findIndex((lyric, idx) => {
+    const nextLyric = trackLyrics[idx + 1]
+    return currentTime >= lyric.time && (!nextLyric || currentTime < nextLyric.time)
+  })
 
-    const ctx = new AudioContextClass() as ExtendedAudioContext
-    audioCtxRef.current = ctx
-
-    // 1. Synthesize Rain (Pink noise with Lowpass Filter)
-    const bufferSize = 2 * ctx.sampleRate
-    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
-    const output = noiseBuffer.getChannelData(0)
-    
-    // Pink noise generation algorithm
-    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0
-    for (let i = 0; i < bufferSize; i++) {
-      const white = Math.random() * 2 - 1
-      b0 = 0.99886 * b0 + white * 0.0555179
-      b1 = 0.99332 * b1 + white * 0.0750759
-      b2 = 0.96900 * b2 + white * 0.1538520
-      b3 = 0.86650 * b3 + white * 0.3104856
-      b4 = 0.55000 * b4 + white * 0.5329522
-      b5 = -0.7616 * b5 - white * 0.0168980
-      output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362
-      output[i] *= 0.11 // keep volume moderate
-      b6 = white * 0.115926
-    }
-
-    const noiseSource = ctx.createBufferSource()
-    noiseSource.buffer = noiseBuffer
-    noiseSource.loop = true
-
-    const filter = ctx.createBiquadFilter()
-    filter.type = 'lowpass'
-    filter.frequency.value = 600
-
-    const rainGain = ctx.createGain()
-    rainGain.gain.value = 0
-
-    noiseSource.connect(filter)
-    filter.connect(rainGain)
-    rainGain.connect(ctx.destination)
-    noiseSource.start()
-
-    rainGainRef.current = rainGain
-
-    // 2. Campfire Crackle (Low frequency rumble + periodic noise clicks)
-    const fireGain = ctx.createGain()
-    fireGain.gain.value = 0
-    fireGain.connect(ctx.destination)
-    fireGainRef.current = fireGain
-
-    // Campfire rumble node (Lowpass filtered pink noise)
-    const rumbleSource = ctx.createBufferSource()
-    rumbleSource.buffer = noiseBuffer
-    rumbleSource.loop = true
-    const rumbleFilter = ctx.createBiquadFilter()
-    rumbleFilter.type = 'lowpass'
-    rumbleFilter.frequency.value = 150
-    const rumbleGain = ctx.createGain()
-    rumbleGain.gain.value = 0.7
-    rumbleSource.connect(rumbleFilter)
-    rumbleFilter.connect(rumbleGain)
-    rumbleGain.connect(fireGain)
-    rumbleSource.start()
-
-    // Periodical crackle generator
-    const interval = setInterval(() => {
-      if (!fireGainRef.current || volumesRef.current.fireVolume === 0 || ctx.state === 'suspended') return
-      const crackleOsc = ctx.createOscillator()
-      const crackleGain = ctx.createGain()
-      crackleOsc.type = 'triangle'
-      crackleOsc.frequency.setValueAtTime(100 + Math.random() * 400, ctx.currentTime)
-      crackleGain.gain.setValueAtTime(Math.random() * 0.15, ctx.currentTime)
-      crackleGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.02 + Math.random() * 0.03)
-      crackleOsc.connect(crackleGain)
-      crackleGain.connect(fireGain)
-      crackleOsc.start()
-      crackleOsc.stop(ctx.currentTime + 0.06)
-    }, 150)
-
-    // 3. Bird Chirp Synthesizer
-    const birdGain = ctx.createGain()
-    birdGain.gain.value = 0
-    birdGain.connect(ctx.destination)
-    birdGainRef.current = birdGain
-
-    const chirpInterval = setInterval(() => {
-      if (!birdGainRef.current || volumesRef.current.birdVolume === 0 || ctx.state === 'suspended') return
-      const now = ctx.currentTime
-      const osc = ctx.createOscillator()
-      const g = ctx.createGain()
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(2000 + Math.random() * 800, now)
-      osc.frequency.exponentialRampToValueAtTime(4000 + Math.random() * 500, now + 0.15)
-      g.gain.setValueAtTime(0, now)
-      g.gain.linearRampToValueAtTime(0.05, now + 0.03)
-      g.gain.exponentialRampToValueAtTime(0.001, now + 0.18)
-      osc.connect(g)
-      g.connect(birdGain)
-      osc.start(now)
-      osc.stop(now + 0.2)
-    }, 2800)
-
-    ctx.intervals = [interval, chirpInterval]
-  }, [])
-
-  // Handle ambient volume adjustments
+  // Auto-scroll active lyric
   useEffect(() => {
-    if (rainVolume > 0 || fireVolume > 0 || birdVolume > 0) {
-      initAmbientSynth()
-    }
-    const ctx = audioCtxRef.current
-    if (ctx && ctx.state === 'suspended') {
-      ctx.resume()
-    }
-
-    if (rainGainRef.current) rainGainRef.current.gain.value = rainVolume * 0.8
-    if (fireGainRef.current) fireGainRef.current.gain.value = fireVolume * 0.6
-    if (birdGainRef.current) birdGainRef.current.gain.value = birdVolume * 0.5
-  }, [rainVolume, fireVolume, birdVolume, initAmbientSynth])
-
-  // Cleanup synthesizer on unmount
-  useEffect(() => {
-    return () => {
-      const ctx = audioCtxRef.current as ExtendedAudioContext | null
-      if (ctx) {
-        if (ctx.intervals) {
-          ctx.intervals.forEach(clearInterval)
-        }
-        ctx.close()
+    if (lyricContainerRef.current) {
+      const activeEl = lyricContainerRef.current.querySelector('[data-active="true"]')
+      if (activeEl) {
+        activeEl.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
       }
     }
-  }, [])
+  }, [activeLyricIdx])
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying)
+    playSynthSound('click')
   }
 
   const handleNext = () => {
     const nextIdx = (currentTrackIdx + 1) % TRACKS.length
     setCurrentTrackIdx(nextIdx)
     setIsPlaying(true)
+    playSynthSound('click')
   }
 
   const handlePrev = () => {
     const prevIdx = (currentTrackIdx - 1 + TRACKS.length) % TRACKS.length
     setCurrentTrackIdx(prevIdx)
     setIsPlaying(true)
+    playSynthSound('click')
   }
 
   const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -230,141 +140,431 @@ export default function MusicWindow() {
   return (
     <div style={{
       display: 'flex',
-      flexDirection: 'row',
+      flexDirection: 'column',
       height: '100%',
-      background: 'transparent',
+      background: 'var(--bg-base)',
       fontFamily: 'var(--font-ui)',
       color: 'var(--text-secondary)',
+      overflow: 'hidden',
+      position: 'relative',
     }}>
-      {/* Sidebar (Desktop only) */}
-      {!isMobile && (
-        <div style={{
-          width: 220,
-          background: 'var(--window-title-bg)',
-          borderRight: '1px solid var(--window-border)',
-          padding: '24px 16px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 28,
-          flexShrink: 0,
-        }}>
-          {/* Title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#f97316' }}>
-            <Music size={20} strokeWidth={2.5} />
-            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: '0.05em' }}>SOUNDCLOUD MINI</span>
-          </div>
+      {/* ── Dynamic Ambient Glow Background Blobs ── */}
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+        {/* Orange Glow */}
+        <motion.div
+          animate={{
+            x: isPlaying ? [0, 40, -30, 0] : 0,
+            y: isPlaying ? [0, -50, 30, 0] : 0,
+            scale: isPlaying ? [1, 1.2, 0.9, 1] : 1,
+          }}
+          transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
+          style={{
+            position: 'absolute', top: '10%', left: '20%',
+            width: 300, height: 300, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, rgba(249, 115, 22, 0) 70%)',
+            filter: 'blur(50px)',
+          }}
+        />
 
-          {/* Tracks List */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Discover Tracks</div>
-            {TRACKS.map((t, idx) => {
-              const isCurrent = idx === currentTrackIdx
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => {
-                    setCurrentTrackIdx(idx)
-                    setIsPlaying(true)
-                  }}
-                  style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
-                    padding: '10px 12px', borderRadius: 10,
-                    background: isCurrent ? 'rgba(249,115,22,0.08)' : 'transparent',
-                    border: `1px solid ${isCurrent ? 'rgba(249,115,22,0.18)' : 'transparent'}`,
-                    color: isCurrent ? '#f97316' : 'var(--text-secondary)',
-                    textAlign: 'left',
-                    cursor: 'none',
-                    transition: 'all 0.2s',
-                  }}
-                >
-                  <span style={{ fontSize: 11, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>
-                    {String(idx + 1).padStart(2, '0')}. {t.title}
-                  </span>
-                  <span style={{ fontSize: 9, color: isCurrent ? '#f97316' : '#9ca3af', marginTop: 2 }}>{t.artist}</span>
-                </button>
-              )
-            })}
-          </div>
+        {/* Pink Glow */}
+        <motion.div
+          animate={{
+            x: isPlaying ? [0, -50, 40, 0] : 0,
+            y: isPlaying ? [0, 30, -50, 0] : 0,
+            scale: isPlaying ? [1, 0.9, 1.15, 1] : 1,
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+          style={{
+            position: 'absolute', bottom: '15%', right: '25%',
+            width: 350, height: 350, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, rgba(236, 72, 153, 0) 70%)',
+            filter: 'blur(60px)',
+          }}
+        />
 
-          {/* System Sound Effects Test */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 'auto' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <Sparkles size={10} /> SFX Test Panel
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-              <button onClick={() => playSynthSound('click')} style={{ fontSize: 9, fontWeight: 600, padding: '6px', background: 'var(--bg-elevated)', border: '1px solid var(--window-border)', color: 'var(--text-secondary)', borderRadius: 6, cursor: 'none' }}>Click</button>
-              <button onClick={() => playSynthSound('open')} style={{ fontSize: 9, fontWeight: 600, padding: '6px', background: 'var(--bg-elevated)', border: '1px solid var(--window-border)', color: 'var(--text-secondary)', borderRadius: 6, cursor: 'none' }}>Open</button>
-              <button onClick={() => playSynthSound('close')} style={{ fontSize: 9, fontWeight: 600, padding: '6px', background: 'var(--bg-elevated)', border: '1px solid var(--window-border)', color: 'var(--text-secondary)', borderRadius: 6, cursor: 'none' }}>Close</button>
-              <button onClick={() => playSynthSound('boot')} style={{ fontSize: 9, fontWeight: 600, padding: '6px', background: 'var(--bg-elevated)', border: '1px solid var(--window-border)', color: 'var(--text-secondary)', borderRadius: 6, cursor: 'none' }}>Boot</button>
-            </div>
-          </div>
-        </div>
-      )}
+        {/* Lavender Glow */}
+        <motion.div
+          animate={{
+            x: isPlaying ? [-20, 20, 0, -20] : 0,
+            y: isPlaying ? [30, -20, 20, 30] : 0,
+          }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+          style={{
+            position: 'absolute', top: '40%', right: '10%',
+            width: 250, height: 250, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(167, 139, 250, 0.08) 0%, rgba(167, 139, 250, 0) 70%)',
+            filter: 'blur(45px)',
+          }}
+        />
+      </div>
 
-      {/* Main Area */}
+      {/* Sleek App Title Bar */}
+      <div style={{
+        height: 40,
+        background: 'var(--window-title-bg)',
+        borderBottom: '1px solid var(--window-border)',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 20px',
+        gap: 8,
+        flexShrink: 0,
+        color: 'var(--orange-vivid)',
+        zIndex: 1,
+      }}>
+        <Music size={16} strokeWidth={2.5} />
+        <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+          Portfolio Music Deck
+        </span>
+      </div>
+
+      {/* Main Grid Wrapper */}
       <div style={{
         flex: 1,
-        padding: isMobile ? '16px' : '32px',
+        padding: isMobile ? 16 : 28,
         display: 'flex',
-        flexDirection: 'column',
-        gap: isMobile ? 20 : 32,
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: isMobile ? 16 : 28,
         overflowY: 'auto',
+        alignItems: 'stretch',
+        zIndex: 1,
       }}>
-        {/* Track Info Card */}
+        
+        {/* COLUMN 1: Vinyl Deck & Player Controls */}
         <div style={{
-          background: 'var(--bg-surface)',
-          border: '1px solid var(--window-border)',
-          borderRadius: 20,
-          padding: isMobile ? '20px' : '24px 32px',
+          flex: isMobile ? 'none' : '1.1',
+          width: '100%',
+          maxWidth: isMobile ? 420 : 340,
+          background: 'var(--bg-glass)',
+          border: '1.5px solid var(--window-border)',
+          borderRadius: 24,
+          padding: 24,
           display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
-          justifyContent: 'space-between',
+          flexDirection: 'column',
           alignItems: 'center',
-          gap: isMobile ? 20 : 16,
-          boxShadow: '0 8px 24px rgba(249,115,22,0.04)',
+          gap: 20,
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.02)',
+          backdropFilter: 'blur(20px)',
+          justifyContent: 'space-between',
         }}>
-          <div style={isMobile ? { textAlign: 'center' } : {}}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f97316', color: '#ffffff', fontSize: 9, fontWeight: 700, padding: '3px 8px', borderRadius: 99, width: 'fit-content', textTransform: 'uppercase', letterSpacing: '0.05em', margin: isMobile ? '0 auto' : '0' }}>
-              SoundCloud Stream
-            </div>
-            <h2 style={{ fontSize: isMobile ? 18 : 20, fontWeight: 800, color: 'var(--text-primary)', marginTop: 12, letterSpacing: '-0.3px' }}>{currentTrack.title}</h2>
-            <p style={{ fontSize: 13, color: '#f97316', fontWeight: 600, marginTop: 4 }}>{currentTrack.artist}</p>
+          {/* Deck Vinyl Area */}
+          <div style={{ position: 'relative', width: 170, height: 170, margin: '5px 0' }}>
+            {/* Needle Arm */}
+            <motion.div
+              animate={{ rotate: isPlaying ? 24 : 0 }}
+              transition={{ type: 'spring', stiffness: 90, damping: 15 }}
+              style={{
+                position: 'absolute',
+                top: -12,
+                right: 12,
+                width: 44,
+                height: 72,
+                zIndex: 10,
+                transformOrigin: 'top right',
+                pointerEvents: 'none',
+              }}
+            >
+              <svg width="44" height="72" viewBox="0 0 44 72" fill="none">
+                <path d="M38 5 L16 36 L20 62" stroke="var(--text-muted)" strokeWidth="2.5" strokeLinecap="round"/>
+                <rect x="15" y="58" width="8" height="10" rx="1.5" fill="var(--orange-vivid)" transform="rotate(-15, 19, 63)" />
+                <circle cx="38" cy="5" r="7" fill="var(--bg-elevated)" stroke="var(--window-border)" strokeWidth="1.5" />
+                <circle cx="38" cy="5" r="2.5" fill="var(--text-secondary)" />
+              </svg>
+            </motion.div>
+
+            {/* Vinyl Record */}
+            <motion.div
+              animate={isPlaying ? { rotate: 360 } : {}}
+              transition={{ ease: 'linear', duration: 12, repeat: Infinity }}
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                background: '#090d16',
+                border: '4px solid var(--window-border)',
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+              }}
+            >
+              {/* Grooves */}
+              <div style={{ position: 'absolute', inset: 6, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.03)' }} />
+              <div style={{ position: 'absolute', inset: 16, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.03)' }} />
+              <div style={{ position: 'absolute', inset: 30, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.03)' }} />
+              <div style={{ position: 'absolute', inset: 48, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.03)' }} />
+
+              {/* Center Label */}
+              <div style={{
+                width: 58,
+                height: 58,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, var(--pink-soft) 0%, var(--orange-soft) 100%)',
+                border: '1.5px solid var(--orange-bright)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.1)',
+              }}>
+                <Music size={18} color="var(--orange-vivid)" strokeWidth={2.5} />
+              </div>
+
+              {/* Vinyl center pin hole */}
+              <div style={{
+                position: 'absolute',
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: 'var(--bg-surface)',
+              }} />
+            </motion.div>
           </div>
 
-          {/* Animated Visualizer (Bouncing bars) */}
+          {/* Title and Artist */}
+          <div style={{ textAlign: 'center', width: '100%' }}>
+            <h2 style={{
+              fontSize: 17,
+              fontWeight: 800,
+              color: 'var(--text-primary)',
+              letterSpacing: '-0.3px',
+              fontFamily: 'var(--font-display)',
+              margin: '0 0 3px 0',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}>
+              {currentTrack.title}
+            </h2>
+            <p style={{
+              fontSize: 12,
+              color: 'var(--orange-vivid)',
+              fontWeight: 700,
+              margin: 0,
+            }}>
+              {currentTrack.artist}
+            </p>
+          </div>
+
+          {/* Visualizer */}
           <div style={{
             display: 'flex',
             alignItems: 'flex-end',
-            gap: 3,
-            height: isMobile ? 40 : 60,
-            width: isMobile ? '100%' : 140,
+            gap: 2.5,
+            height: 32,
             justifyContent: 'center',
+            width: '100%',
             overflow: 'hidden',
           }}>
-            {visualizerBars.slice(0, isMobile ? 14 : 18).map((bar, i) => {
-              return (
-                <div
-                  key={i}
+            {visualizerBars.slice(0, 18).map((bar, i) => (
+              <div
+                key={i}
+                style={{
+                  width: 3,
+                  height: isPlaying ? bar.maxH * 0.9 : 4,
+                  background: 'var(--pink-vivid)',
+                  borderRadius: 1,
+                  animation: isPlaying ? `bounceVisualizer ${bar.duration}s ease-in-out ${i * 0.03}s infinite alternate` : 'none',
+                  transition: 'height 0.3s ease',
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Player controls */}
+          <div style={{
+            width: '100%',
+            borderTop: '1px solid var(--window-border)',
+            paddingTop: 14,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 12,
+          }}>
+            {/* Progress track */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-muted)', width: 30 }}>{formatTime(currentTime)}</span>
+              <input
+                type="range"
+                min="0"
+                max={duration || 100}
+                value={currentTime}
+                onChange={handleProgressChange}
+                style={{
+                  flex: 1,
+                  cursor: 'none',
+                  accentColor: 'var(--orange-vivid)',
+                  height: 4,
+                  borderRadius: 2,
+                }}
+              />
+              <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-muted)', width: 30 }}>{formatTime(duration)}</span>
+            </div>
+
+            {/* Controls panel */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <button onClick={handlePrev} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'none', display: 'flex', padding: 4 }}>
+                  <SkipBack size={16} />
+                </button>
+
+                <button
+                  onClick={handlePlayPause}
                   style={{
-                    width: 4,
-                    height: isPlaying ? (isMobile ? bar.maxH * 0.7 : bar.maxH) : 6,
-                    background: 'var(--pink-vivid)',
+                    width: 36, height: 36, borderRadius: '50%',
+                    background: 'var(--orange-vivid)',
+                    color: '#ffffff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    border: 'none',
+                    boxShadow: '0 4px 10px rgba(249,115,22,0.25)',
+                    cursor: 'none',
+                    transition: 'transform 0.1s',
+                  }}
+                >
+                  {isPlaying ? <Pause size={16} fill="#ffffff" /> : <Play size={16} fill="#ffffff" style={{ marginLeft: 2 }} />}
+                </button>
+
+                <button onClick={handleNext} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'none', display: 'flex', padding: 4 }}>
+                  <SkipForward size={16} />
+                </button>
+              </div>
+
+              {/* Volume */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <button
+                  onClick={toggleMute}
+                  style={{ background: 'none', border: 'none', color: 'var(--orange-vivid)', cursor: 'none', display: 'flex', alignItems: 'center', padding: 4 }}
+                >
+                  {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+                </button>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={isMuted ? 0 : volume}
+                  onChange={(e) => setVolume(parseFloat(e.target.value))}
+                  style={{
+                    width: 60,
+                    cursor: 'none',
+                    accentColor: 'var(--orange-vivid)',
+                    height: 4,
                     borderRadius: 2,
-                    animation: isPlaying ? `bounceVisualizer ${bar.duration}s ease-in-out infinite alternate` : 'none',
-                    animationDelay: `${i * 0.04}s`,
-                    transition: 'height 0.3s ease',
                   }}
                 />
-              )
-            })}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Discover Tracks (Mobile Only, since sidebar is hidden) */}
-        {isMobile && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <h3 style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Discover Tracks</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {/* COLUMN 2: Live Synced Lyrics (Desktop: Center column, Mobile: Tabbed below player) */}
+        {(!isMobile || mobileTab === 'lyrics') && (
+          <div style={{
+            flex: 1,
+            width: '100%',
+            background: 'var(--bg-glass)',
+            border: '1.5px solid var(--window-border)',
+            borderRadius: 24,
+            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.02)',
+            backdropFilter: 'blur(20px)',
+          }}>
+            <h3 style={{
+              fontSize: 10,
+              fontWeight: 800,
+              color: 'var(--text-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              margin: 0,
+            }}>
+              Live Melodic Script
+            </h3>
+
+            {/* Lyrics Scroll Pane */}
+            <div
+              ref={lyricContainerRef}
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                paddingRight: 8,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 20,
+                scrollBehavior: 'smooth',
+                height: isMobile ? 180 : 'none',
+              }}
+            >
+              {trackLyrics.length > 0 ? (
+                trackLyrics.map((line, idx) => {
+                  const isActive = idx === activeLyricIdx
+                  return (
+                    <p
+                      key={idx}
+                      data-active={isActive ? 'true' : 'false'}
+                      style={{
+                        fontSize: isActive ? 15 : 12,
+                        fontWeight: isActive ? 700 : 500,
+                        color: isActive ? 'var(--orange-vivid)' : 'var(--text-muted)',
+                        margin: 0,
+                        lineHeight: 1.5,
+                        textAlign: 'center',
+                        transition: 'all 0.3s ease',
+                        transform: isActive ? 'scale(1.03)' : 'scale(1)',
+                        textShadow: isActive ? '0 0 12px rgba(249, 115, 22, 0.15)' : 'none',
+                      }}
+                    >
+                      {line.text}
+                    </p>
+                  )
+                })
+              ) : (
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 12 }}>
+                  Lyrics unavailable for this track
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* COLUMN 3: Queue List (Desktop: Right column, Mobile: Tabbed below player) */}
+        {(!isMobile || mobileTab === 'queue') && (
+          <div style={{
+            width: '100%',
+            maxWidth: isMobile ? 420 : 280,
+            background: 'var(--bg-glass)',
+            border: '1.5px solid var(--window-border)',
+            borderRadius: 24,
+            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.02)',
+            backdropFilter: 'blur(20px)',
+          }}>
+            <h3 style={{
+              fontSize: 10,
+              fontWeight: 800,
+              color: 'var(--text-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              margin: 0,
+            }}>
+              Tracks Queue ({TRACKS.length})
+            </h3>
+
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
+              overflowY: 'auto',
+              flex: 1,
+              height: isMobile ? 180 : 'none',
+            }}>
               {TRACKS.map((t, idx) => {
                 const isCurrent = idx === currentTrackIdx
                 return (
@@ -373,209 +573,142 @@ export default function MusicWindow() {
                     onClick={() => {
                       setCurrentTrackIdx(idx)
                       setIsPlaying(true)
+                      playSynthSound('click')
                     }}
                     style={{
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      padding: '12px 16px', borderRadius: 12,
-                      background: isCurrent ? 'rgba(249,115,22,0.06)' : 'var(--bg-surface)',
-                      border: `1px solid ${isCurrent ? '#f97316' : 'var(--window-border)'}`,
-                      color: isCurrent ? '#f97316' : 'var(--text-secondary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '10px 12px',
+                      borderRadius: 12,
+                      background: isCurrent ? 'var(--orange-soft)' : 'var(--bg-surface)',
+                      border: `1.5px solid ${isCurrent ? 'var(--orange-bright)' : 'var(--window-border)'}`,
+                      color: isCurrent ? 'var(--orange-vivid)' : 'var(--text-secondary)',
                       textAlign: 'left',
                       cursor: 'none',
                       transition: 'all 0.2s',
+                      boxShadow: isCurrent ? 'none' : '0 2px 6px rgba(0,0,0,0.01)',
                     }}
                   >
-                    <div>
-                      <div style={{ fontSize: 12, fontWeight: 700 }}>
-                        {String(idx + 1).padStart(2, '0')}. {t.title}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                      {/* Bouncing tiny wave indicator */}
+                      <div style={{
+                        width: 22, height: 22, borderRadius: 6,
+                        background: isCurrent ? 'rgba(249,115,22,0.08)' : 'var(--bg-elevated)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 9, fontWeight: 800,
+                        color: isCurrent ? 'var(--orange-vivid)' : 'var(--text-muted)',
+                        flexShrink: 0,
+                      }}>
+                        {isCurrent && isPlaying ? (
+                          <div style={{ display: 'flex', gap: 1, height: 8, alignItems: 'flex-end' }}>
+                            {[0, 1, 2].map((n) => (
+                              <div
+                                key={n}
+                                style={{
+                                  width: 1.5,
+                                  height: '100%',
+                                  background: 'var(--orange-vivid)',
+                                  borderRadius: 0.5,
+                                  animation: 'miniBounce 0.5s ease-in-out infinite alternate',
+                                  animationDelay: `${n * 0.15}s`,
+                                }}
+                              />
+                            ))}
+                          </div>
+                        ) : (
+                          String(idx + 1).padStart(2, '0')
+                        )}
                       </div>
-                      <div style={{ fontSize: 9, color: '#9ca3af', marginTop: 2 }}>{t.artist}</div>
+
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {t.title}
+                        </div>
+                        <div style={{ fontSize: 9, color: isCurrent ? 'var(--orange-vivid)' : 'var(--text-muted)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {t.artist}
+                        </div>
+                      </div>
                     </div>
-                    <span style={{ fontSize: 10, color: '#9ca3af', fontWeight: 600 }}>{t.duration}</span>
+
+                    <span style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 700, paddingLeft: 6 }}>
+                      {t.duration}
+                    </span>
                   </button>
                 )
               })}
             </div>
           </div>
         )}
+      </div>
 
-        {/* Sound FX & Ambient Mixer Panel */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <h3 style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Ambient Noise Mixer</h3>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
-            gap: 12,
-          }}>
-            {/* Rain Node */}
-            <div style={{
-              background: 'var(--bg-surface)', border: '1px solid var(--window-border)', borderRadius: 16, padding: '14px 18px',
-              display: 'flex', flexDirection: 'column', gap: 8,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, fontWeight: 700, color: '#0284c7' }}>
-                <CloudRain size={15} /> Rain Generator
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={rainVolume}
-                onChange={(e) => setRainVolume(parseFloat(e.target.value))}
-                style={{ width: '100%', cursor: 'none', accentColor: '#0ea5e9' }}
-              />
-              <span style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 600 }}>Volume: {Math.round(rainVolume * 100)}%</span>
-            </div>
-
-            {/* Fire Node */}
-            <div style={{
-              background: 'var(--bg-surface)', border: '1px solid var(--window-border)', borderRadius: 16, padding: '14px 18px',
-              display: 'flex', flexDirection: 'column', gap: 8,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, fontWeight: 700, color: '#d97706' }}>
-                <Flame size={15} /> Campfire crackles
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={fireVolume}
-                onChange={(e) => setFireVolume(parseFloat(e.target.value))}
-                style={{ width: '100%', cursor: 'none', accentColor: '#ec4899' }}
-              />
-              <span style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 600 }}>Volume: {Math.round(fireVolume * 100)}%</span>
-            </div>
-
-            {/* Bird Node */}
-            <div style={{
-              background: 'var(--bg-surface)', border: '1px solid var(--window-border)', borderRadius: 16, padding: '14px 18px',
-              display: 'flex', flexDirection: 'column', gap: 8,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, fontWeight: 700, color: '#16a34a' }}>
-                <Bird size={15} /> Forest birds
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={birdVolume}
-                onChange={(e) => setBirdVolume(parseFloat(e.target.value))}
-                style={{ width: '100%', cursor: 'none', accentColor: '#10b981' }}
-              />
-              <span style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 600 }}>Volume: {Math.round(birdVolume * 100)}%</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Music Player Controls Bottom */}
+      {/* ── Mobile Segment Tab Control ── */}
+      {isMobile && (
         <div style={{
-          marginTop: isMobile ? 12 : 'auto',
-          borderTop: '1px solid var(--window-border)',
-          paddingTop: '20px',
+          padding: '0 16px 16px',
           display: 'flex',
-          flexDirection: 'column',
-          gap: 16,
+          justifyContent: 'center',
+          zIndex: 1,
         }}>
-          {/* Progress track */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 10, fontWeight: 600, color: '#9ca3af', width: 32 }}>{formatTime(currentTime)}</span>
-            <input
-              type="range"
-              min="0"
-              max={duration || 100}
-              value={currentTime}
-              onChange={handleProgressChange}
+          <div style={{
+            background: 'var(--bg-glass)',
+            border: '1.5px solid var(--window-border)',
+            borderRadius: 14,
+            padding: 4,
+            display: 'flex',
+            gap: 4,
+            width: '100%',
+            maxWidth: 320,
+          }}>
+            <button
+              onClick={() => { setMobileTab('lyrics'); playSynthSound('click') }}
               style={{
                 flex: 1,
+                padding: '8px 0',
+                borderRadius: 10,
+                border: 'none',
+                background: mobileTab === 'lyrics' ? 'var(--orange-soft)' : 'transparent',
+                color: mobileTab === 'lyrics' ? 'var(--orange-vivid)' : 'var(--text-muted)',
+                fontWeight: 700,
+                fontSize: 11,
                 cursor: 'none',
-                accentColor: '#f97316',
-                height: 4,
-                borderRadius: 2,
+                transition: 'all 0.2s',
               }}
-            />
-            <span style={{ fontSize: 10, fontWeight: 600, color: '#9ca3af', width: 32 }}>{formatTime(duration)}</span>
-          </div>
-
-          {/* Controls Bar */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: 16,
-          }}>
-            {/* Skip Back / Play / Skip Forward */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              <button onClick={handlePrev} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'none' }}>
-                <SkipBack size={20} />
-              </button>
-
-              <button
-                onClick={handlePlayPause}
-                style={{
-                  width: 44, height: 44, borderRadius: '50%',
-                  background: '#f97316',
-                  color: '#ffffff',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  border: 'none',
-                  boxShadow: '0 4px 12px rgba(249,115,22,0.3)',
-                  cursor: 'none',
-                  transition: 'transform 0.1s',
-                }}
-              >
-                {isPlaying ? <Pause size={20} fill="#ffffff" /> : <Play size={20} fill="#ffffff" style={{ marginLeft: 3 }} />}
-              </button>
-
-              <button onClick={handleNext} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'none' }}>
-                <SkipForward size={20} />
-              </button>
-            </div>
-
-            {/* Visualizer CSS style helper */}
-            <style>{`
-              @keyframes bounceVisualizer {
-                0% { height: 6px; }
-                100% { height: 48px; }
-              }
-            `}</style>
-
-            {/* Mute & Sound Controls */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <button
-                onClick={toggleMute}
-                style={{ background: 'none', border: 'none', color: '#f97316', cursor: 'none', display: 'flex', alignItems: 'center' }}
-              >
-                {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-              </button>
-              
-              {/* Volume Slider */}
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={isMuted ? 0 : volume}
-                onChange={(e) => {
-                  setVolume(parseFloat(e.target.value))
-                }}
-                style={{
-                  width: 80,
-                  cursor: 'none',
-                  accentColor: '#f97316',
-                  height: 4,
-                  borderRadius: 2,
-                }}
-              />
-              
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#f97316', whiteSpace: 'nowrap' }}>
-                {isMuted ? 'Muted' : `${Math.round(volume * 100)}%`}
-              </div>
-            </div>
+            >
+              Lyrics Script
+            </button>
+            <button
+              onClick={() => { setMobileTab('queue'); playSynthSound('click') }}
+              style={{
+                flex: 1,
+                padding: '8px 0',
+                borderRadius: 10,
+                border: 'none',
+                background: mobileTab === 'queue' ? 'var(--orange-soft)' : 'transparent',
+                color: mobileTab === 'queue' ? 'var(--orange-vivid)' : 'var(--text-muted)',
+                fontWeight: 700,
+                fontSize: 11,
+                cursor: 'none',
+                transition: 'all 0.2s',
+              }}
+            >
+              Tracks Queue
+            </button>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Visualizer & Wave CSS style helpers */}
+      <style>{`
+        @keyframes bounceVisualizer {
+          0% { height: 4px; }
+          100% { height: 24px; }
+        }
+        @keyframes miniBounce {
+          0% { height: 2px; }
+          100% { height: 8px; }
+        }
+      `}</style>
     </div>
   )
 }

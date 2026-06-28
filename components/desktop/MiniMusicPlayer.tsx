@@ -24,6 +24,8 @@ export default function MiniMusicPlayer() {
   if (!showMiniPlayer || isMobile) return null
 
   const currentTrack = TRACKS[currentTrackIdx]
+  const openWins = Object.values(windows)
+  const isAnyAppActive = openWins.some(win => win.isOpen && !win.isMinimized)
 
   const handlePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -45,14 +47,20 @@ export default function MiniMusicPlayer() {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9, y: 30 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
+      animate={{
+        opacity: isAnyAppActive ? 0 : 1,
+        scale: isAnyAppActive ? 0.92 : 1,
+        y: isAnyAppActive ? 20 : 0,
+        bottom: isAnyAppActive ? 12 : 76,
+        zIndex: isAnyAppActive ? 8000 : 9999,
+        pointerEvents: isAnyAppActive ? 'none' : 'auto',
+      }}
       exit={{ opacity: 0, scale: 0.9, y: 30 }}
       whileHover={{ scale: 1.02 }}
       onClick={handleRestore}
       data-cursor="pointer"
       style={{
         position: 'fixed',
-        bottom: isMobile ? 104 : 76,
         left: isMobile ? 16 : 'auto',
         right: isMobile ? 16 : 24,
         width: isMobile ? 'calc(100% - 32px)' : 280,
@@ -66,7 +74,6 @@ export default function MiniMusicPlayer() {
         alignItems: 'center',
         padding: '0 16px',
         gap: 12,
-        zIndex: 9999, // Ensure it floats on top of other icons
         overflow: 'hidden',
         userSelect: 'none',
       }}
@@ -119,8 +126,7 @@ export default function MiniMusicPlayer() {
                 height: isPlaying ? '100%' : 2,
                 background: 'var(--pink-vivid)',
                 borderRadius: 1,
-                animation: isPlaying ? `miniBounce 0.6s ease-in-out infinite alternate` : 'none',
-                animationDelay: `${i * 0.12}s`,
+                animation: isPlaying ? `miniBounce 0.6s ease-in-out ${i * 0.12}s infinite alternate` : 'none',
               }}
             />
           ))}

@@ -3,9 +3,9 @@ import { Project, Skill, Experience, Education, Certificate, Achievement, Folder
 export const OWNER = {
   name: 'Nguyen Ngoc Phuong',
   nameVi: 'Nguyễn Ngọc Phương',
-  role: 'Marketing Manager',
-  roleAlt: 'Brand Storyteller',
-  bio: 'Passionate about building meaningful brand stories and connecting people with what they love. I turn insights into impactful campaigns that move hearts and drive results.',
+  role: 'Marketing Executive',
+  roleAlt: 'SEO & Brand Strategist',
+  bio: 'As someone who is constantly striving for improvement, I consider myself a professional who seamlessly blends strategy with creativity. I am seeking a challenging role where I can apply my skills in strategic planning and creative problem-solving, while gaining valuable experience in customer and market insights as well as strategic development.',
   location: 'Vietnam',
   available: true,
   email: 'phuong@example.com',
@@ -19,11 +19,11 @@ export const FOLDERS: FolderData[] = [
   { id: 'experience', label: 'Experience', icon: 'Briefcase', component: 'ExperienceWindow', defaultSize: { width: 700, height: 560 } },
   { id: 'education', label: 'Education', icon: 'GraduationCap', component: 'EducationWindow', defaultSize: { width: 660, height: 480 } },
   { id: 'certificates', label: 'Certificates', icon: 'Award', component: 'CertificatesWindow', defaultSize: { width: 700, height: 520 } },
-  { id: 'achievements', label: 'Achievements', icon: 'Star', component: 'AchievementsWindow', defaultSize: { width: 660, height: 480 } },
+  // { id: 'achievements', label: 'Achievements', icon: 'Star', component: 'AchievementsWindow', defaultSize: { width: 660, height: 480 } },
   { id: 'contact', label: 'Contact', icon: 'Mail', component: 'ContactWindow', defaultSize: { width: 680, height: 520 } },
   { id: 'resume', label: 'Resume', icon: 'FileText', component: 'ResumeWindow', defaultSize: { width: 740, height: 560 } },
   { id: 'music', label: 'SoundCloud', icon: 'Music', component: 'MusicWindow', defaultSize: { width: 720, height: 500 } },
-  { id: 'browser', label: 'Browser', icon: 'Globe', component: 'BrowserWindow', defaultSize: { width: 880, height: 600 } },
+  // { id: 'browser', label: 'Browser', icon: 'Globe', component: 'BrowserWindow', defaultSize: { width: 880, height: 600 } },
   { id: 'secret', label: '???', icon: 'Lock', component: 'SecretWindow', defaultSize: { width: 600, height: 460 } },
 ]
 
@@ -115,70 +115,68 @@ export const SKILL_COLORS: Record<string, string> = {
 export const EXPERIENCES: Experience[] = [
   {
     id: 'e1',
-    company: 'Creative Agency VN',
-    role: 'Senior Marketing Manager',
-    period: '2023 — Present',
+    company: 'CellphoneS',
+    role: 'SEO Content Writer',
+    period: '2025 — 2026',
     description: [
-      'Led end-to-end marketing for 12 brand clients across fashion, beauty, and lifestyle sectors',
-      'Managed a team of 6 including designers, content writers, and media buyers',
-      'Delivered 3 award-winning campaigns recognized by Vietnam Marketing Association',
-      'Grew average client social following by 120% year-over-year',
+      'Authored search-optimized technology and finance articles, mastering advanced SEO and analytics tools',
+      'Increased organic traffic to target retail product categories through high-intent keyword positioning',
+      'Collaborated with media and design teams to align content with CellphoneS campaign promotions',
     ],
-    technologies: ['Brand Strategy', 'Team Leadership', 'Social Media', 'Campaign Management'],
+    technologies: ['SEO Writing', 'Keyword Research', 'Google Analytics', 'Tech & Finance Content'],
   },
   {
     id: 'e2',
-    company: 'Beauty Brand Co.',
-    role: 'Brand & Content Manager',
-    period: '2021 — 2023',
+    company: 'Viettel Group',
+    role: 'SEO Intern',
+    period: '2025',
     description: [
-      'Developed the brand\'s first comprehensive content strategy across all platforms',
-      'Managed partnerships with 60+ KOLs generating 15M+ reach per quarter',
-      'Launched 4 major product collections with sell-out results in week 1',
-      'Built in-house content studio reducing production costs by 40%',
+      'Conducted keyword research and competitive analysis for telecom and digital services',
+      'Optimized on-page SEO components including meta-data, heading structures, and internal links',
+      'Monitored website traffic metrics and keyword rankings using Google Search Console',
     ],
-    technologies: ['Content Strategy', 'KOL Marketing', 'Product Launch', 'Brand Identity'],
+    technologies: ['On-page SEO', 'Google Search Console', 'Competitor Analysis', 'Telecom Marketing'],
   },
   {
     id: 'e3',
-    company: 'Digital Marketing Studio',
-    role: 'Marketing Specialist',
-    period: '2019 — 2021',
+    company: 'Freelance & FPT Projects',
+    role: 'Project Manager & Content Creator',
+    period: '2022 — 2025',
     description: [
-      'Executed digital campaigns for 20+ brands in F&B, fashion, and lifestyle',
-      'Managed monthly ad budgets up to $50K with 4x average ROAS',
-      'Created viral content achieving 10M+ organic views on TikTok',
+      'Led the "Tâm Giới" project, organizing a highly successful community event for over 100 participants',
+      'Managed social media channels and executed digital seeding strategies for local restaurant brands',
+      'Began professional journey writing engaging copy and articles for lifestyle and digital clients',
     ],
-    technologies: ['Digital Marketing', 'Meta Ads', 'TikTok', 'Content Creation'],
+    technologies: ['Project Management', 'Fanpage Management', 'Seeding Campaigns', 'Copywriting'],
   },
 ]
 
 export const EDUCATION: Education[] = [
   {
     id: 'ed1',
-    institution: 'University of Economics',
+    institution: 'FPT University',
     degree: 'Bachelor of Business Administration',
-    field: 'Marketing & Brand Management',
-    period: '2015 — 2019',
-    gpa: '3.65 / 4.0',
-    activities: ['Marketing Club President', 'Student Brand Competition Winner', 'Event Coordinator'],
+    field: 'Major: Digital Marketing',
+    period: '2022 — 2026',
+    gpa: '3.1',
+    activities: ['Led the "Tâm Giới" Project', 'SEO Content Writing (Viettel & CellphoneS)', 'Social Media & Brand Seeding Campaigns'],
   },
 ]
 
 export const CERTIFICATES: Certificate[] = [
-  { id: 'c1', name: 'Meta Certified Digital Marketer', issuer: 'Meta', year: '2024', credentialId: 'META-DM-2024' },
-  { id: 'c2', name: 'Google Digital Marketing', issuer: 'Google', year: '2023', credentialId: 'GDM-2023' },
-  { id: 'c3', name: 'HubSpot Content Marketing', issuer: 'HubSpot', year: '2023', credentialId: 'HS-CM-2023' },
-  { id: 'c4', name: 'TikTok Marketing Science', issuer: 'TikTok', year: '2023', credentialId: 'TT-MS-2023' },
-  { id: 'c5', name: 'Brand Strategy Certification', issuer: 'CIM UK', year: '2022', credentialId: 'CIM-BS-2022' },
-  { id: 'c6', name: 'Project Management (PMP)', issuer: 'PMI', year: '2021', credentialId: 'PMP-2021' },
+  { id: 'c1', name: 'TOEIC — Score 680', issuer: 'ETS (Educational Testing Service)', year: '2024' },
+  { id: 'c2', name: 'HSK4 & HSKK Intermediate', issuer: 'Hanban / Confucius Institute', year: '2024' },
+  { id: 'c3', name: 'Human Resource Management and Leadership Specialization', issuer: 'Coursera', year: '2025', verifyUrl: 'https://coursera.org/share/fb9ccc6f351ca18c604b0bf10ec59593' },
+  { id: 'c4', name: 'Information Systems Specialization', issuer: 'Coursera', year: '2025', verifyUrl: 'https://www.coursera.org/account/accomplishments/specialization/IIAHK60DI4GX' },
+  { id: 'c5', name: 'UI / UX Design Specialization', issuer: 'Coursera', year: '2025', verifyUrl: 'https://coursera.org/share/547dd076c85a038954eda07eebe92265' },
+  { id: 'c6', name: 'Social Media Marketing Specialization', issuer: 'Coursera', year: '2025', verifyUrl: 'https://coursera.org/share/e169c194ddcb633fb72b60cc8908d4ef' },
+  { id: 'c7', name: 'Project Management Principles and Practices Specialization', issuer: 'Coursera', year: '2025', verifyUrl: 'https://coursera.org/share/d6185b88ec4b46e7e3aa337bc9d748ae' },
 ]
 
 export const ACHIEVEMENTS: Achievement[] = [
-  { id: 'a1', title: 'Best Digital Campaign — Vietnam Marketing Awards 2023', description: 'Won Gold at the VMA for the "Beauty for Everyone" inclusive campaign that reached 5M people.', year: '2023' },
-  { id: 'a2', title: 'Top 30 Under 30 — Marketing Leaders', description: 'Recognized by Marketing Magazine Vietnam as one of the top emerging marketing leaders in the country.', year: '2023' },
-  { id: 'a3', title: 'Campaign of the Year — TikTok APAC', description: '"Summer Stories" campaign was selected as TikTok\'s regional case study in APAC for organic growth strategy.', year: '2022' },
-  { id: 'a4', title: 'Speaker — Vietnam Marketing Summit', description: 'Delivered keynote on "Authentic Brand Storytelling in the Age of Short-Form Video" to 800+ attendees.', year: '2023' },
+  { id: 'a1', title: 'Led the "Tâm Giới" Project — 2024', description: 'Organized and branded a community event from scratch, achieving over 100 participants and high social engagement.', year: '2024' },
+  { id: 'a2', title: 'FPT University Marketing Hackathon Winner', description: 'Awarded 1st place in the university-wide brand strategy and digital marketing hackathon.', year: '2025' },
+  { id: 'a3', title: 'High-Performance SEO Articles — CellphoneS', description: 'Ranked 20+ competitive tech and retail keywords in the Google search top 3, increasing organic page views.', year: '2025' },
 ]
 
 export const SOCIAL_LINKS = [
@@ -198,11 +196,9 @@ export const INTERESTS = [
 ]
 
 export const ABOUT_TIMELINE = [
-  { year: '2015', label: 'Started my journey', detail: 'Enrolled in Marketing at University of Economics — fell in love with the power of brands' },
-  { year: '2017', label: 'First campaign', detail: 'Ran my first student marketing campaign for a local cafe — 3x their followers in 2 months' },
-  { year: '2019', label: 'Graduated & launched', detail: 'Graduated with honors and joined a digital studio managing my first real brand clients' },
-  { year: '2021', label: 'Brand Manager', detail: 'Moved to Beauty Brand Co. to lead brand strategy and content — best years of growth' },
-  { year: '2022', label: 'First major award', detail: 'Won TikTok APAC Campaign of the Year — a moment I will never forget' },
-  { year: '2023', label: 'Top 30 Under 30', detail: 'Named one of Vietnam\'s top marketing leaders — now leading a team of 6 at Creative Agency VN' },
-  { year: '2024', label: 'Building forward', detail: 'Expanding into brand consulting and helping Vietnamese brands tell their stories to the world' },
+  { year: '2022', label: 'Graduated from Tran Bien High School & First Gigs', detail: 'Graduated from Tran Bien High School (Bien Hoa). Enrolled in Digital Marketing at FPT University and immediately started my professional journey as a Content Writer.' },
+  { year: '2023', label: 'Stepping into Fanpage Management', detail: 'Advanced my skills by taking on social media management roles. Fully managed marketing, executed seeding campaigns, and handled community engagement for brands.' },
+  { year: '2024', label: 'Project Management & Branding', detail: 'Led the "Tâm Giới" project, successfully building an impactful community event with over 100 participants. Concurrently managed social media and visual branding restaurant.' },
+  { year: '2025', label: 'Stepping into Big Brands (Viettel & CellphoneS)', detail: 'Joined Viettel as an SEO Intern and CellphoneS as an SEO Content Writer. Gained hands-on experience writing optimized tech/finance articles and mastering advanced SEO tools.' },
+  { year: '2026', label: 'Graduated & Looking Forward', detail: 'Graduated with a 3.1 GPA from FPT University, backed by 5 specialized certifications. Ready for a challenging role in strategic planning and creative problem-solving.' },
 ]

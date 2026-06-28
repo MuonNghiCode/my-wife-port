@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { ArrowLeft, ArrowRight, RotateCw, Home, ExternalLink } from 'lucide-react'
+import { ArrowLeft, ArrowRight, RotateCw, Home, ExternalLink, Lock, Globe } from 'lucide-react'
 import { SOCIAL_LINKS } from '@/data/portfolio'
 
 export default function BrowserWindow() {
@@ -94,7 +94,7 @@ export default function BrowserWindow() {
           color: 'var(--text-primary)',
         }}>
           <span style={{ color: '#059669', display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ fontSize: 10 }}>🔒</span> Secure
+            <Lock size={12} /> Secure
           </span>
           <span style={{ color: '#9ca3af' }}>|</span>
           <input 
@@ -172,7 +172,7 @@ export default function BrowserWindow() {
           userSelect: 'none',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span>🌐</span>
+            <Globe size={13} />
             <span>Browsing real address: <strong style={{ fontWeight: 700 }}>{url}</strong></span>
           </div>
           <a 

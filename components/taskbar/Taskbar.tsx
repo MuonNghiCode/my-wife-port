@@ -2,10 +2,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useDesktopStore } from '@/store/desktopStore'
-import { useSoundStore, playSynthSound } from '@/store/soundStore'
+import { useSoundStore, playSynthSound, TRACKS } from '@/store/soundStore'
 import { useBootStore } from '@/store/bootStore'
 import { FOLDERS, OWNER } from '@/data/portfolio'
-import { Volume2, VolumeX, Power, Moon, Sun } from 'lucide-react'
+import { Volume2, VolumeX, Power, Moon, Sun, Play, Pause, SkipForward } from 'lucide-react'
 import * as Icons from 'lucide-react'
 
 function Clock() {
@@ -37,8 +37,8 @@ function getIcon(name: string) {
 }
 
 export default function Taskbar() {
-  const { windows, restoreWindow, focusWindow, focusedWindowId } = useDesktopStore()
-  const { isMuted, toggleMute } = useSoundStore()
+  const { windows, restoreWindow, focusWindow, focusedWindowId, minimizeWindow } = useDesktopStore()
+  const { isMuted, toggleMute, isPlaying, currentTrackIdx, setIsPlaying, setCurrentTrackIdx } = useSoundStore()
   const { setPhase } = useBootStore()
   
   const [isStartOpen, setIsStartOpen] = useState(false)
@@ -46,6 +46,10 @@ export default function Taskbar() {
   const startMenuRef = useRef<HTMLDivElement>(null)
 
   const openWins = Object.values(windows)
+  const isAnyAppActive = openWins.some(win => win.isOpen && !win.isMinimized)
+  const musicWin = windows['music']
+  const isMusicRunningBg = musicWin && musicWin.isOpen && musicWin.isMinimized
+  const currentTrack = TRACKS[currentTrackIdx]
 
   // Initialize theme on mount
   useEffect(() => {
@@ -158,9 +162,15 @@ export default function Taskbar() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                onClick={() => {
-                  if (win.isMinimized) restoreWindow(win.id)
-                  else focusWindow(win.id)
+                onPointerDown={(e) => {
+                  e.stopPropagation()
+                  if (win.isMinimized) {
+                    restoreWindow(win.id)
+                  } else if (win.id === focusedWindowId) {
+                    minimizeWindow(win.id)
+                  } else {
+                    focusWindow(win.id)
+                  }
                 }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 6,
@@ -206,6 +216,103 @@ export default function Taskbar() {
           })}
         </AnimatePresence>
       </div>
+
+      {/* Taskbar Music Control Pill (Desktop only, when minimized and app active) */}
+      <AnimatePresence>
+        {isMusicRunningBg && currentTrack && isAnyAppActive && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, x: 10 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.9, x: 10 }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              background: 'var(--bg-glass)',
+              border: '1.5px solid var(--window-border)',
+              borderRadius: 10,
+              height: 36,
+              padding: '0 10px',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+              pointerEvents: 'auto',
+            }}
+          >
+            {/* Small Bouncing Visualizer */}
+            <div style={{ display: 'flex', gap: 1.5, height: 8, alignItems: 'flex-end' }}>
+              {[0, 1, 2].map((n) => (
+                <div
+                  key={n}
+                  style={{
+                    width: 1.5,
+                    height: isPlaying ? '100%' : 2,
+                    background: 'var(--orange-vivid)',
+                    borderRadius: 0.5,
+                    animation: isPlaying ? 'miniBounce 0.5s ease-in-out infinite alternate' : 'none',
+                    animationDelay: `${n * 0.15}s`,
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Title */}
+            <span
+              onClick={() => restoreWindow('music')}
+              data-cursor="pointer"
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                maxWidth: 120,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                cursor: 'none',
+              }}
+            >
+              {currentTrack.title}
+            </span>
+
+            {/* Divider */}
+            <div style={{ width: 1, height: 16, background: 'var(--window-border)' }} />
+
+            {/* Play/Pause */}
+            <button
+              onClick={() => setIsPlaying(!isPlaying)}
+              style={{
+                background: 'none', border: 'none', color: 'var(--orange-vivid)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: 4, cursor: 'none'
+              }}
+            >
+              {isPlaying ? <Pause size={12} fill="var(--orange-vivid)" /> : <Play size={12} fill="var(--orange-vivid)" />}
+            </button>
+
+            {/* Next */}
+            <button
+              onClick={() => {
+                const nextIdx = (currentTrackIdx + 1) % TRACKS.length
+                setCurrentTrackIdx(nextIdx)
+                setIsPlaying(true)
+              }}
+              style={{
+                background: 'none', border: 'none', color: 'var(--text-secondary)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: 4, cursor: 'none'
+              }}
+            >
+              <SkipForward size={12} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Bounce Keyframes Style */}
+      <style>{`
+        @keyframes miniBounce {
+          0% { height: 2px; }
+          100% { height: 8px; }
+        }
+      `}</style>
 
       {/* System tray */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>

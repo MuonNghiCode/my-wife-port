@@ -14,14 +14,21 @@ export const TRACKS: Track[] = [
     title: 'Merry Christmas Mr. Lawrence',
     artist: 'Ryuichi Sakamoto (Violin, Cello & Piano)',
     url: '/audio/Merry Christmas Mr. Lawrence_ Violin,Cello&Piano (Ryuichi Sakamoto).mp3',
-    duration: '4:49',
+    duration: '5:16',
   },
   {
     id: 't2',
+    title: 'We are never met but, can we have a coffee or something?',
+    artist: 'In Love With A Ghost',
+    url: '/audio/in love with a ghost _ weve never met but, can we have a coffee or something_.mp3',
+    duration: '3:18',
+  },
+  {
+    id: 't3',
     title: 'FAKE LOVE (Orchestral Cover)',
     artist: 'BTS (방탄소년단)',
     url: '/audio/BTS (방탄소년단) FAKE LOVE Orchestral Cover.mp3',
-    duration: '4:09',
+    duration: '4:02',
   },
 ]
 
