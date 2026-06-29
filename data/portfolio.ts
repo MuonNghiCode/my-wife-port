@@ -6,9 +6,10 @@ export const OWNER = {
   role: 'Marketing Executive',
   roleAlt: 'SEO & Brand Strategist',
   bio: 'As someone who is constantly striving for improvement, I consider myself a professional who seamlessly blends strategy with creativity. I am seeking a challenging role where I can apply my skills in strategic planning and creative problem-solving, while gaining valuable experience in customer and market insights as well as strategic development.',
-  location: 'Vietnam',
+  location: 'Bien Hoa, Dong Nai',
   available: true,
-  email: 'phuong@example.com',
+  email: 'ngocphuong070404@gmail.com',
+  phone: '0865407135',
   usbLabel: 'PHUONG.usb',
 }
 
@@ -72,44 +73,40 @@ export const PROJECTS: Project[] = [
 ]
 
 export const SKILLS: Skill[] = [
-  // Branding & Strategy (using frontend as category key)
-  { name: 'Brand Strategy', level: 92, category: 'frontend' },
-  { name: 'Storytelling', level: 95, category: 'frontend' },
-  { name: 'Campaign Planning', level: 90, category: 'frontend' },
-  { name: 'Market Research', level: 85, category: 'frontend' },
-  // Social Media (using backend)
-  { name: 'Content Creation', level: 90, category: 'backend' },
-  { name: 'Social Media Strategy', level: 88, category: 'backend' },
-  { name: 'KOL / Influencer Marketing', level: 84, category: 'backend' },
-  { name: 'Community Management', level: 86, category: 'backend' },
-  // Digital Advertising (using database)
-  { name: 'Meta Ads', level: 80, category: 'database' },
-  { name: 'Google Ads', level: 76, category: 'database' },
-  { name: 'TikTok Ads', level: 82, category: 'database' },
-  // Events & PR (using cloud)
-  { name: 'Event Management', level: 78, category: 'cloud' },
-  { name: 'Public Relations', level: 80, category: 'cloud' },
-  { name: 'Press & Media', level: 75, category: 'cloud' },
-  // Tools (using tools)
-  { name: 'Canva / Adobe', level: 82, category: 'tools' },
-  { name: 'Analytics & Data', level: 78, category: 'tools' },
-  { name: 'CRM & Email Tools', level: 74, category: 'tools' },
+  // Strategic Planning (frontend)
+  { name: 'Strategic Planning', level: 100, category: 'frontend' },
+  { name: 'Project & Event Management', level: 100, category: 'frontend' },
+  { name: 'Brand & Visual Identity', level: 100, category: 'frontend' },
+  // SEO & Content Marketing (backend)
+  { name: 'SEO Content Writing', level: 100, category: 'backend' },
+  { name: 'Social Media Management', level: 100, category: 'backend' },
+  { name: 'Community Engagement & Seeding', level: 100, category: 'backend' },
+  { name: 'On-page Optimization & SEO Tools', level: 100, category: 'backend' },
+  // Design & Design Thinking (database)
+  { name: 'UI / UX Design', level: 100, category: 'database' },
+  { name: 'Graphic & Print Design', level: 100, category: 'database' },
+  // Tools & Analytics (cloud)
+  { name: 'Canva / Microsoft PowerPoint', level: 100, category: 'cloud' },
+  { name: 'Office Productivity (Word/Excel)', level: 100, category: 'cloud' },
+  // Languages & Interpersonal (tools)
+  { name: 'Customer & Community Relations', level: 100, category: 'tools' },
+  { name: 'Foreign Languages (English & Chinese)', level: 100, category: 'tools' },
 ]
 
 export const SKILL_CATEGORIES_LABELS: Record<string, string> = {
-  frontend: 'Brand & Strategy',
-  backend: 'Social & Content',
-  database: 'Digital Advertising',
-  cloud: 'Events & PR',
-  tools: 'Tools & Analytics',
+  frontend: 'Strategic Planning',
+  backend: 'SEO & Content Marketing',
+  database: 'Design & Design Thinking',
+  cloud: 'Tools & Analytics',
+  tools: 'Languages & Interpersonal',
 }
 
 export const SKILL_COLORS: Record<string, string> = {
-  frontend: '#f9a8d4',
-  backend: '#93c5fd',
-  database: '#c4b5fd',
-  cloud: '#6ee7b7',
-  tools: '#fcd34d',
+  frontend: 'var(--orange-vivid)',
+  backend: 'var(--blue-vivid)',
+  database: 'var(--pink-vivid)',
+  cloud: '#10b981',
+  tools: '#8b5cf6',
 }
 
 export const EXPERIENCES: Experience[] = [

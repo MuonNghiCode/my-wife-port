@@ -1,8 +1,15 @@
 'use client'
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useRef, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { OWNER, SOCIAL_LINKS } from '@/data/portfolio'
-import { Send, Mail, MapPin, Globe } from 'lucide-react'
+import { Send, Mail, Globe, Phone, Check, MessageSquare, ShieldCheck, ChevronLeft } from 'lucide-react'
+import { playSynthSound } from '@/store/soundStore'
+import emailjs from '@emailjs/browser'
+
+// Read EmailJS credentials from environment variables (.env.local)
+const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || ''
+const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || ''
+const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || ''
 
 const Linkedin = (props: React.SVGProps<SVGSVGElement> & { size?: number }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={props.size ?? 24} height={props.size ?? 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
@@ -20,259 +27,474 @@ const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>
   Linkedin, Instagram, Facebook, Globe,
 }
 
-type FormState = { name: string; email: string; subject: string; message: string }
+interface Message {
+  id: string
+  sender: 'phuong' | 'user'
+  text: string
+}
 
 export default function ContactWindow() {
-  const [form, setForm] = useState<FormState>({ name: '', email: '', subject: '', message: '' })
-  const [sent, setSent] = useState(false)
-  const [sending, setSending] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([
+    { id: '1', sender: 'phuong', text: "Hi there! I'm Nguyen Ngoc Phuong. Let's collaborate!" },
+    { id: '2', sender: 'phuong', text: "To start sending your message directly to my email, what is your name?" }
+  ])
+  const [inputValue, setInputValue] = useState('')
+  const [chatStep, setChatStep] = useState(0) // 0: Name, 1: Email, 2: Subject, 3: Message, 4: Done
+  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' })
+  const [copiedType, setCopiedType] = useState<'email' | 'phone' | null>(null)
+  const feedEndRef = useRef<HTMLDivElement>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setSending(true)
-    setTimeout(() => {
-      setSent(true)
-      setSending(false)
-      setForm({ name: '', email: '', subject: '', message: '' })
-    }, 1200)
+  // Scroll to bottom on new messages
+  useEffect(() => {
+    feedEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  const handleCopy = (text: string, type: 'email' | 'phone') => {
+    navigator.clipboard.writeText(text)
+    playSynthSound('click')
+    setCopiedType(type)
+    setTimeout(() => setCopiedType(null), 2000)
   }
 
-  const inputStyle = {
-    width: '100%',
-    background: 'var(--bg-surface)',
-    border: '1px solid var(--window-border)',
-    borderRadius: 10,
-    padding: '11px 14px',
-    color: 'var(--text-primary)',
-    fontFamily: 'var(--font-ui)',
-    fontSize: 13,
-    outline: 'none',
-    transition: 'border-color 0.2s',
+  const handleSend = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    if (!inputValue.trim() || chatStep >= 4) return
+
+    playSynthSound('click')
+    const userText = inputValue.trim()
+    setInputValue('')
+
+    // Append user message bubble
+    const userMsgId = Math.random().toString()
+    setMessages(prev => [...prev, { id: userMsgId, sender: 'user', text: userText }])
+
+    if (chatStep === 0) {
+      setFormData(prev => ({ ...prev, name: userText }))
+      setChatStep(1)
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: Math.random().toString(),
+          sender: 'phuong',
+          text: `Nice to meet you, ${userText}! What is your email address so I can reply?`
+        }])
+      }, 700)
+    } else if (chatStep === 1) {
+      setFormData(prev => ({ ...prev, email: userText }))
+      setChatStep(2)
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: Math.random().toString(),
+          sender: 'phuong',
+          text: "Got it! What is the subject of your message?"
+        }])
+      }, 700)
+    } else if (chatStep === 2) {
+      setFormData(prev => ({ ...prev, subject: userText }))
+      setChatStep(3)
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: Math.random().toString(),
+          sender: 'phuong',
+          text: "Great. Now write your message description below. I will send it straight to my email in the background!"
+        }])
+      }, 700)
+    } else if (chatStep === 3) {
+      const finalFormData = { ...formData, message: userText }
+      setFormData(prev => ({ ...prev, message: userText }))
+      setChatStep(4)
+
+      // Temporary sending bubble
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: 'sending-status',
+          sender: 'phuong',
+          text: "Perfect! Sending your message directly to ngocphuong070404@gmail.com..."
+        }])
+      }, 500)
+
+      // Post in background to FormSubmit
+      try {
+        if (EMAILJS_PUBLIC_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
+          // Send using EmailJS library
+          await emailjs.send(
+            EMAILJS_SERVICE_ID,
+            EMAILJS_TEMPLATE_ID,
+            {
+              from_name: finalFormData.name,
+              from_email: finalFormData.email,
+              subject: finalFormData.subject,
+              message: finalFormData.message,
+              to_email: 'ngocphuong070404@gmail.com',
+            },
+            EMAILJS_PUBLIC_KEY
+          )
+        } else {
+          // Fallback background API
+          const response = await fetch('https://formsubmit.co/ajax/ngocphuong070404@gmail.com', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+            body: JSON.stringify({
+              name: finalFormData.name,
+              email: finalFormData.email,
+              subject: finalFormData.subject,
+              message: finalFormData.message,
+              _honey: '',
+            }),
+          })
+
+          if (!response.ok) {
+            throw new Error('Send failed')
+          }
+        }
+
+        setTimeout(() => {
+          setMessages(prev => prev.filter(m => m.id !== 'sending-status').concat([
+            {
+              id: Math.random().toString(),
+              sender: 'phuong',
+              text: "Message sent directly to my email! I have received it and will respond within 24 hours. Thank you!"
+            }
+          ]))
+        }, 1000)
+      } catch {
+        setTimeout(() => {
+          setMessages(prev => prev.filter(m => m.id !== 'sending-status').concat([
+            {
+              id: Math.random().toString(),
+              sender: 'phuong',
+              text: "Background send failed, but you can always reach me directly at ngocphuong070404@gmail.com. Thank you!"
+            }
+          ]))
+        }, 1000)
+      }
+    }
+  }
+
+  const getPlaceholder = () => {
+    switch (chatStep) {
+      case 0: return 'Type your name...'
+      case 1: return 'Type your email...'
+      case 2: return 'Type the subject...'
+      case 3: return 'Type your message...'
+      default: return 'Message sent successfully.'
+    }
   }
 
   return (
-    <div style={{ height: '100%', overflowY: 'auto', padding: '24px 28px', fontFamily: 'var(--font-ui)', background: 'transparent' }}>
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 24 }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
-          Let&apos;s connect
-        </div>
-        <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-          I&apos;d love to hear about your brand and how we can work together.
-        </div>
-      </motion.div>
-
-      {/* Quick info */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}
-      >
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 7,
-          padding: '8px 14px', borderRadius: 10,
-          background: 'var(--pink-soft)', /* Solid pastel pink bg */
-          border: '1px solid var(--pink-bright)',
-          fontSize: 12, color: 'var(--pink-vivid)',
-          fontWeight: 600,
-        }}>
-          <Mail size={13} />
-          {OWNER.email}
-        </div>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 7,
-          padding: '8px 14px', borderRadius: 10,
-          background: 'var(--blue-soft)', /* Solid pastel blue bg */
-          border: '1px solid var(--blue-bright)',
-          fontSize: 12, color: 'var(--blue-vivid)',
-          fontWeight: 600,
-        }}>
-          <MapPin size={13} />
-          Vietnam
-        </div>
-        {OWNER.available && (
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 7,
-            padding: '8px 14px', borderRadius: 10,
-            background: 'rgba(16, 185, 129, 0.1)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            fontSize: 12, color: '#10b981',
-            fontWeight: 600,
-          }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }} />
-            Open to collaboration
+    <div className="contact-console-container" style={{
+      height: '100%',
+      display: 'flex',
+      fontFamily: 'var(--font-ui)',
+      background: 'transparent',
+    }}>
+      {/* Left Sidebar: Desktop only */}
+      <div className="contact-console-sidebar" style={{
+        width: 240,
+        borderRight: '1.5px solid var(--window-border)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        flexShrink: 0,
+        background: 'var(--bg-glass)',
+        backdropFilter: 'blur(20px)',
+      }}>
+        {/* Sidebar Header */}
+        <div style={{ padding: '18px 20px', borderBottom: '1.5px solid var(--window-border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <MessageSquare size={16} color="var(--blue-vivid)" />
+            <span style={{ fontSize: 12.5, fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              Conversations
+            </span>
           </div>
-        )}
-      </motion.div>
-
-      {/* Form */}
-      <AnimatePresence mode="wait">
-        {sent ? (
-          <motion.div
-            key="success"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            style={{
-              textAlign: 'center', padding: '48px 24px',
-              background: 'var(--pink-soft)', /* Solid soft pink card */
-              border: '1px solid var(--pink-bright)',
-              borderRadius: 16,
-            }}
-          >
-            <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 0.5 }}
-              style={{ marginBottom: 16 }}
-            >
-              <Send size={40} color="var(--pink-vivid)" style={{ margin: '0 auto' }} />
-            </motion.div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
-              Message sent!
-            </div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-              I&apos;ll get back to you within 24 hours.
-            </div>
-            <motion.button
-              data-cursor="pointer"
-              whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
-              onClick={() => setSent(false)}
-              style={{
-                marginTop: 20, padding: '8px 20px', borderRadius: 99,
-                background: 'var(--bg-surface)', border: '1px solid var(--window-border)',
-                color: 'var(--text-secondary)', fontSize: 13, cursor: 'none', fontFamily: 'var(--font-ui)',
-                fontWeight: 600,
-              }}
-            >
-              Send another
-            </motion.button>
-          </motion.div>
-        ) : (
-          <motion.form
-            key="form"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            onSubmit={handleSubmit}
-            style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
-          >
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              {['name', 'email'].map(field => (
-                <div key={field}>
-                  <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 6, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                    {field === 'name' ? 'Your Name' : 'Email Address'}
-                  </label>
-                  <input
-                    type={field === 'email' ? 'email' : 'text'}
-                    value={form[field as keyof FormState]}
-                    onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
-                    required
-                    style={inputStyle}
-                    onFocus={e => (e.target.style.borderColor = 'var(--pink-vivid)')}
-                    onBlur={e => (e.target.style.borderColor = 'var(--window-border)')}
-                    placeholder={field === 'name' ? 'Nguyễn Văn A' : 'hello@brand.vn'}
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div>
-              <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 6, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                Subject
-              </label>
-              <input
-                value={form.subject}
-                onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
-                required
-                style={inputStyle}
-                onFocus={e => (e.target.style.borderColor = 'var(--pink-vivid)')}
-                onBlur={e => (e.target.style.borderColor = 'var(--window-border)')}
-                placeholder="Brand campaign collaboration..."
-              />
-            </div>
-
-            <div>
-              <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 6, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                Message
-              </label>
-              <textarea
-                value={form.message}
-                onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-                required
-                rows={4}
-                style={{ ...inputStyle, resize: 'vertical' }}
-                onFocus={e => (e.target.style.borderColor = 'var(--pink-vivid)')}
-                onBlur={e => (e.target.style.borderColor = 'var(--window-border)')}
-                placeholder="Tell me about your brand and what you're looking for..."
-              />
-            </div>
-
-            <motion.button
-              type="submit"
-              data-cursor="pointer"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              disabled={sending}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                padding: '13px 24px', borderRadius: 12,
-                background: '#ec4899', /* Solid pink button */
-                border: 'none', color: '#ffffff',
-                fontFamily: 'var(--font-ui)', fontWeight: 700, fontSize: 14,
-                cursor: 'none', opacity: sending ? 0.7 : 1,
-                boxShadow: '0 4px 12px rgba(236,72,153,0.15)',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#db2777')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#ec4899')}
-            >
-              <Send size={15} />
-              {sending ? 'Sending...' : 'Send Message'}
-            </motion.button>
-          </motion.form>
-        )}
-      </AnimatePresence>
-
-      {/* Social */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid var(--window-border)' }}
-      >
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>
-          Find me on
         </div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {SOCIAL_LINKS.map(link => {
-            const Icon = ICON_MAP[link.icon] ?? Globe
+
+        {/* Chats List */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
+            borderRadius: 14, background: 'var(--bg-elevated)', border: '1px solid var(--window-border)',
+          }}>
+            <div style={{ position: 'relative' }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: '50%',
+                background: 'var(--blue-vivid)15', border: '1px solid var(--blue-vivid)30',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 14, fontWeight: 900, color: 'var(--blue-vivid)',
+              }}>
+                NP
+              </div>
+              <span style={{
+                position: 'absolute', right: 0, bottom: 0,
+                width: 9, height: 9, borderRadius: '50%',
+                background: '#10b981', border: '1.5px solid var(--bg-surface)',
+                boxShadow: '0 0 6px #10b981',
+              }} />
+            </div>
+            <div style={{ flex: 1, overflow: 'hidden' }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {OWNER.name}
+              </div>
+              <div style={{ fontSize: 10, color: '#10b981', fontWeight: 700 }}>Active Now</div>
+            </div>
+          </div>
+
+          <div style={{ height: 1, background: 'var(--window-border)', margin: '4px 8px' }} />
+
+          {/* Social Links */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <span style={{ fontSize: 9.5, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', paddingLeft: 8, marginBottom: 4 }}>
+              Social Channels
+            </span>
+            {SOCIAL_LINKS.map(link => {
+              const Icon = ICON_MAP[link.icon] ?? Globe
+              return (
+                <a
+                  key={link.platform}
+                  href={link.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  data-cursor="pointer"
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px',
+                    borderRadius: 8, fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)',
+                    textDecoration: 'none', transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = 'var(--bg-elevated)'
+                    e.currentTarget.style.color = 'var(--text-primary)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'transparent'
+                    e.currentTarget.style.color = 'var(--text-secondary)'
+                  }}
+                >
+                  <Icon size={12.5} color="var(--text-muted)" />
+                  <span>{link.platform}</span>
+                </a>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Sidebar Footer */}
+        <div style={{ padding: '16px 20px', borderTop: '1.5px solid var(--window-border)', background: 'var(--bg-surface)50' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, fontWeight: 700, color: '#10b981' }}>
+            <ShieldCheck size={13} />
+            <span>FormSubmit.co API</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Content Area: iMessage Client */}
+      <div className="contact-console-main" style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'var(--bg-glass)',
+        backdropFilter: 'blur(20px)',
+      }}>
+        {/* iMessage Header Bar */}
+        <div style={{
+          padding: '12px 18px',
+          borderBottom: '1px solid var(--window-border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: 'var(--bg-glass)',
+          backdropFilter: 'blur(25px)',
+          flexShrink: 0,
+        }}>
+          {/* Back button (iMessage style) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, width: 60 }}>
+            <span className="imessage-back-btn" style={{
+              display: 'flex', alignItems: 'center', gap: 2,
+              fontSize: 13.5, color: '#007aff', fontWeight: 600, cursor: 'none',
+            }}>
+              <ChevronLeft size={18} />
+              <span>Back</span>
+            </span>
+          </div>
+
+          {/* Center Contact Info */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            {/* Round Avatar */}
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%',
+              background: 'var(--bg-elevated)', border: '1px solid var(--window-border)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 11, fontWeight: 900, color: 'var(--text-secondary)',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+            }}>
+              NP
+            </div>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>
+              Nguyen Ngoc Phuong
+            </span>
+          </div>
+
+          {/* Quick Copy Action Shortcuts */}
+          <div style={{ display: 'flex', gap: 6, width: 60, justifyContent: 'flex-end' }}>
+            <button
+              onClick={() => handleCopy(OWNER.email, 'email')}
+              data-cursor="pointer"
+              title="Copy Email"
+              style={{
+                border: 'none', background: 'transparent', padding: 4, cursor: 'none',
+                color: copiedType === 'email' ? '#10b981' : '#007aff',
+              }}
+            >
+              {copiedType === 'email' ? <Check size={15} /> : <Mail size={15} />}
+            </button>
+            <button
+              onClick={() => handleCopy(OWNER.phone!, 'phone')}
+              data-cursor="pointer"
+              title="Copy Phone"
+              style={{
+                border: 'none', background: 'transparent', padding: 4, cursor: 'none',
+                color: copiedType === 'phone' ? '#10b981' : '#007aff',
+              }}
+            >
+              {copiedType === 'phone' ? <Check size={15} /> : <Phone size={15} />}
+            </button>
+          </div>
+        </div>
+
+        {/* iMessage Chat Bubble Feed */}
+        <div style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '20px 20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+        }}>
+          {messages.map((msg) => {
+            const isMe = msg.sender === 'user'
             return (
-              <a key={link.platform} href={link.url} target="_blank" rel="noreferrer" data-cursor="pointer"
+              <div
+                key={msg.id}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '7px 14px', borderRadius: 99, fontSize: 12,
-                  background: 'var(--bg-elevated)', border: '1px solid var(--window-border)',
-                  color: 'var(--text-secondary)', textDecoration: 'none',
-                  transition: 'all 0.2s',
-                  fontWeight: 600,
-                }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.color = 'var(--pink-vivid)'
-                  el.style.borderColor = 'var(--pink-bright)'
-                  el.style.background = 'var(--pink-soft)'
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement
-                  el.style.color = 'var(--text-secondary)'
-                  el.style.borderColor = 'var(--window-border)'
-                  el.style.background = 'var(--bg-elevated)'
+                  display: 'flex',
+                  justifyContent: isMe ? 'flex-end' : 'flex-start',
+                  width: '100%',
                 }}
               >
-                <Icon size={13} /> {link.platform}
-              </a>
+                <div style={{
+                  maxWidth: '70%',
+                  background: isMe ? '#007aff' : 'var(--bg-elevated)',
+                  border: isMe ? 'none' : '1px solid var(--window-border)',
+                  color: isMe ? '#ffffff' : 'var(--text-primary)',
+                  borderRadius: isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                  padding: '10px 16px',
+                  fontSize: 13,
+                  lineHeight: 1.5,
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+                  whiteSpace: 'pre-wrap',
+                }}>
+                  {msg.text}
+                </div>
+              </div>
             )
           })}
+          <div ref={feedEndRef} />
         </div>
-      </motion.div>
+
+        {/* iMessage Input Bar */}
+        <div style={{
+          padding: '12px 16px',
+          background: 'var(--bg-glass)',
+          borderTop: '1px solid var(--window-border)',
+          flexShrink: 0,
+        }}>
+          <form onSubmit={handleSend} style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: 'var(--bg-surface)',
+            border: '1.5px solid var(--window-border)',
+            borderRadius: 22,
+            padding: '4px 6px 4px 14px',
+            gap: 10,
+          }}>
+            <input
+              type={chatStep === 1 ? 'email' : 'text'}
+              placeholder={getPlaceholder()}
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              disabled={chatStep >= 4}
+              style={{
+                flex: 1,
+                border: 'none',
+                background: 'transparent',
+                outline: 'none',
+                color: 'var(--text-primary)',
+                fontFamily: 'var(--font-ui)',
+                fontSize: 13,
+                padding: '6px 0',
+              }}
+            />
+            <motion.button
+              type="submit"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              disabled={chatStep >= 4 || !inputValue.trim()}
+              style={{
+                width: 28, height: 28, borderRadius: '50%',
+                background: '#007aff', border: 'none',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#ffffff', cursor: 'none',
+                opacity: (!inputValue.trim() || chatStep >= 4) ? 0.4 : 1,
+                transition: 'opacity 0.2s',
+                flexShrink: 0,
+              }}
+            >
+              <Send size={12} color="#ffffff" fill="#ffffff" />
+            </motion.button>
+          </form>
+
+          {/* Reset chat option for completed states */}
+          {chatStep >= 4 && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
+              <button
+                onClick={() => {
+                  setChatStep(0)
+                  setFormData({ name: '', email: '', subject: '', message: '' })
+                  setMessages([
+                    { id: '1', sender: 'phuong', text: "Hi there! I'm Nguyen Ngoc Phuong. Let's collaborate!" },
+                    { id: '2', sender: 'phuong', text: "To start sending your message directly to my email, what is your name?" }
+                  ])
+                }}
+                data-cursor="pointer"
+                style={{
+                  border: 'none', background: 'transparent', color: '#007aff',
+                  fontSize: 11, fontWeight: 700, cursor: 'none',
+                }}
+              >
+                Restart Conversation
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Style overrides for responsive stacking and iMessage look on mobile */}
+      <style>{`
+        @media (max-width: 768px) {
+          .contact-console-sidebar {
+            display: none !important;
+          }
+          .imessage-back-btn {
+            display: flex !important;
+          }
+        }
+        @media (min-width: 769px) {
+          .imessage-back-btn {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }
