@@ -4,6 +4,11 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Nguyễn Ngọc Phương — Portfolio',
   description: 'Full Stack Engineer & Creative Developer. Insert USB to explore my digital workspace.',
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' }
+    ]
+  },
   openGraph: {
     title: 'Nguyễn Ngọc Phương — Portfolio',
     description: 'An interactive OS-style portfolio. Insert USB. Boot PC. Explore.',
