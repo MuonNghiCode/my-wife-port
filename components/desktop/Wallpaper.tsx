@@ -23,12 +23,13 @@ export default function Wallpaper() {
     return () => observer.disconnect()
   }, [])
 
-  // Control video playback based on theme transitions
+  // Control video playback based on theme transitions (including smooth seeked-based reverse)
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
 
-    let animationFrameId: number
+    let isDestroyed = false
+    let targetTime = video.currentTime
 
     // Handle initial state immediately on load without playing the transition
     if (isInitial.current) {
@@ -43,50 +44,44 @@ export default function Wallpaper() {
     }
 
     const checkForward = () => {
+      if (isDestroyed) return
       if (video.currentTime >= 5) {
         video.currentTime = 5
         video.pause()
       } else {
-        animationFrameId = requestAnimationFrame(checkForward)
+        requestAnimationFrame(checkForward)
       }
     }
 
-    const playBackward = () => {
-      if (video.seeking) {
-        animationFrameId = requestAnimationFrame(playBackward)
-        return
-      }
-
-      const current = video.currentTime
-      // Use a fixed step size of 0.22 seconds for ultra-fast, smooth reverse playback
-      const nextTime = current - 0.22
-
-      if (nextTime <= 0) {
+    const handleSeeked = () => {
+      if (isDestroyed || isDark) return
+      if (targetTime <= 0) {
         video.currentTime = 0
         video.pause()
       } else {
-        video.currentTime = nextTime
-        animationFrameId = requestAnimationFrame(playBackward)
+        // Step backward by 0.15s, synchronized with decoder performance
+        targetTime = Math.max(0, targetTime - 0.15)
+        video.currentTime = targetTime
       }
     }
 
     if (isDark) {
-      // Play forward: set playbackRate to 2.5x, check when it hits 5s to pause
       video.playbackRate = 2.5
       video.play().catch(() => {
-        // Prevent autoplay policy exceptions if the user hasn't interacted yet
+        // Prevent autoplay policy exceptions
       })
-      animationFrameId = requestAnimationFrame(checkForward)
+      requestAnimationFrame(checkForward)
     } else {
-      // Play backward: pause and wait a single frame for state stabilization before starting the seek loop
       video.pause()
-      animationFrameId = requestAnimationFrame(() => {
-        animationFrameId = requestAnimationFrame(playBackward)
-      })
+      video.addEventListener('seeked', handleSeeked)
+      // Trigger the first step backward
+      targetTime = Math.max(0, video.currentTime - 0.15)
+      video.currentTime = targetTime
     }
 
     return () => {
-      cancelAnimationFrame(animationFrameId)
+      isDestroyed = true
+      video.removeEventListener('seeked', handleSeeked)
     }
   }, [isDark])
 
@@ -125,10 +120,10 @@ export default function Wallpaper() {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        radius: Math.random() * 2 + 1, // subtle glow size: 1px to 3px
-        vx: (Math.random() - 0.5) * 0.15, // very gentle left/right sway
-        vy: -(Math.random() * 0.25 + 0.1), // gentle floating upwards speed
-        opacity: Math.random() * 0.35 + 0.1, // opacity range
+        radius: Math.random() * 2 + 1,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: -(Math.random() * 0.25 + 0.1),
+        opacity: Math.random() * 0.35 + 0.1,
         pulseSpeed: Math.random() * 0.02 + 0.005,
         pulsePhase: Math.random() * Math.PI * 2,
       })
@@ -137,22 +132,16 @@ export default function Wallpaper() {
     const draw = () => {
       ctx.clearRect(0, 0, width, height)
 
-      // Particles color palettes matching the theme
-      // Dark theme: soft rose pink / orange (236, 72, 153)
-      // Light theme: soft sky blue (14, 165, 233)
       const r = isDark ? 236 : 14
       const g = isDark ? 72 : 165
       const b = isDark ? 153 : 233
 
       for (let i = 0; i < particleCount; i++) {
         const p = particles[i]
-
-        // Update particle physics
         p.x += p.vx
         p.y += p.vy
         p.pulsePhase += p.pulseSpeed
 
-        // Reset positions at boundaries
         if (p.x < 0) p.x = width
         if (p.x > width) p.x = 0
         if (p.y < 0) {
@@ -160,11 +149,9 @@ export default function Wallpaper() {
           p.x = Math.random() * width
         }
 
-        // Shimmering pulse opacity
         const currentOpacity = p.opacity + Math.sin(p.pulsePhase) * 0.08
         const finalOpacity = Math.max(0.05, Math.min(0.45, currentOpacity))
 
-        // Draw particle
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${finalOpacity})`
@@ -173,7 +160,7 @@ export default function Wallpaper() {
         ctx.fill()
       }
 
-      ctx.shadowBlur = 0 // reset shadow property for clean loop
+      ctx.shadowBlur = 0
       animationFrameId = requestAnimationFrame(draw)
     }
 
@@ -213,10 +200,10 @@ export default function Wallpaper() {
           inset: 0,
           width: '100%',
           height: '100%',
-          mixBlendMode: 'screen', // blends the glowing lights perfectly with the video background
+          mixBlendMode: 'screen',
         }}
       />
-      {/* A very soft warm overlay to reduce glare and harmonize colors */}
+      {/* Soft warm overlay to reduce glare */}
       <div style={{
         position: 'absolute',
         inset: 0,

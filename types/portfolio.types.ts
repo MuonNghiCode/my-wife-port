@@ -40,7 +40,9 @@ export interface Project {
   githubUrl?: string
   liveUrl?: string
   image: string
-  category: 'web' | 'mobile' | 'oss' | 'other'
+  images?: string[]
+  category: string
+  result?: string
 }
 
 export interface Skill {
