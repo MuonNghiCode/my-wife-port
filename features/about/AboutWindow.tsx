@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { OWNER, ABOUT_TIMELINE, INTERESTS } from '@/data/portfolio'
+import { OWNER_VI, ABOUT_TIMELINE_VI, INTERESTS_VI, UI_STRINGS } from '@/data/translations'
+import { useDesktopStore } from '@/store/desktopStore'
 import * as Icons from 'lucide-react'
 import { MapPin, CheckCircle2, Sparkles } from 'lucide-react'
 
@@ -50,6 +52,7 @@ function getIcon(name: string, size = 13) {
 }
 
 export default function AboutWindow() {
+  const { language } = useDesktopStore()
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
@@ -60,6 +63,15 @@ export default function AboutWindow() {
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
+
+  const roleText = language === 'vi' ? OWNER_VI.role : OWNER.role
+  const locationText = language === 'vi' ? OWNER_VI.location : OWNER.location
+  const bioText = language === 'vi' ? OWNER_VI.bio : OWNER.bio
+  const timelineData = language === 'vi' ? ABOUT_TIMELINE_VI : ABOUT_TIMELINE
+  const interestsData = language === 'vi' ? INTERESTS_VI : INTERESTS
+  const typingTexts = language === 'vi' 
+    ? ['Người viết bài chuẩn SEO', 'Nhà hoạch định chiến lược', 'Giải quyết vấn đề sáng tạo']
+    : ['SEO Content Writer', 'Strategic Planner', 'Creative Problem Solver']
 
   return (
     <div style={{
@@ -146,10 +158,10 @@ export default function AboutWindow() {
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
             }}>
-              Marketing Executive
+              {roleText}
             </div>
             <div style={{ fontSize: 13, minHeight: 20, marginBottom: 12 }}>
-              <TypingText texts={['SEO Content Writer', 'Strategic Planner', 'Creative Problem Solver']} />
+              <TypingText texts={typingTexts} />
             </div>
           </div>
 
@@ -164,7 +176,7 @@ export default function AboutWindow() {
             {/* Location */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, color: 'var(--text-secondary)' }}>
               <MapPin size={14} color="var(--pink-vivid)" />
-              <span>{OWNER.location}</span>
+              <span>{locationText}</span>
             </div>
 
             {/* Availability */}
@@ -173,7 +185,7 @@ export default function AboutWindow() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
-                fontSize: 12,
+                fontSize: 11.5,
                 color: '#059669',
                 background: 'rgba(5, 150, 105, 0.08)',
                 border: '1px solid rgba(5, 150, 105, 0.2)',
@@ -183,7 +195,7 @@ export default function AboutWindow() {
                 width: 'fit-content',
               }}>
                 <CheckCircle2 size={13} color="#059669" />
-                <span>Open to collaboration</span>
+                <span>{language === 'vi' ? 'Sẵn sàng hợp tác' : 'Open to collaboration'}</span>
               </div>
             )}
           </div>
@@ -209,11 +221,11 @@ export default function AboutWindow() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
               <Sparkles size={14} color="var(--pink-vivid)" />
               <h3 style={{ fontSize: 11, fontWeight: 800, color: 'var(--pink-vivid)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>
-                My Story
+                {UI_STRINGS[language].biography}
               </h3>
             </div>
             <p style={{ fontSize: 15, lineHeight: 1.8, color: 'var(--text-secondary)', margin: 0 }}>
-              As someone who is constantly striving for improvement, I consider myself a professional who seamlessly blends strategy with creativity. I am seeking a challenging role where I can apply my skills in <strong style={{ fontWeight: 800, color: 'var(--text-primary)' }}>strategic planning</strong> and <strong style={{ fontWeight: 800, color: 'var(--text-primary)' }}>creative problem-solving</strong>, while gaining valuable experience in customer and market insights as well as strategic development.
+              {bioText}
             </p>
           </motion.div>
 
@@ -232,7 +244,7 @@ export default function AboutWindow() {
             }}
           >
             <h3 style={{ fontSize: 10, fontWeight: 800, color: 'var(--blue-vivid)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 20 }}>
-              My Journey
+              {UI_STRINGS[language].careerTimeline}
             </h3>
             
             <div style={{ position: 'relative', paddingLeft: 22 }}>
@@ -242,7 +254,7 @@ export default function AboutWindow() {
                 width: 1.5, background: 'var(--window-border)',
               }} />
               
-              {ABOUT_TIMELINE.map((item, i) => (
+              {timelineData.map((item, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, x: -8 }}
@@ -292,11 +304,11 @@ export default function AboutWindow() {
             }}
           >
             <h3 style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16 }}>
-              Outside of Work
+              {UI_STRINGS[language].interests}
             </h3>
             
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {INTERESTS.map((item, i) => (
+              {interestsData.map((item, i) => (
                 <motion.div
                   key={i}
                   whileHover={{ scale: 1.05, y: -2 }}

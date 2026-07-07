@@ -32,7 +32,7 @@ const WINDOW_MAP: Record<string, React.ComponentType> = {
 }
 
 export default function WindowManager() {
-  const { windows } = useDesktopStore()
+  const { windows, language } = useDesktopStore()
 
   return (
     <>
@@ -41,7 +41,7 @@ export default function WindowManager() {
         if (!Content) return null
         return (
           <Window key={win.id} window={win}>
-            <Content />
+            <Content key={language} />
           </Window>
         )
       })}

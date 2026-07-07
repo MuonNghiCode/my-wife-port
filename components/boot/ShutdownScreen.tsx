@@ -2,10 +2,12 @@
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useBootStore } from '@/store/bootStore'
+import { useDesktopStore } from '@/store/desktopStore'
 import { Power } from 'lucide-react'
 
 export default function ShutdownScreen() {
   const { phase, setPhase } = useBootStore()
+  const { language } = useDesktopStore()
 
   useEffect(() => {
     if (phase === 'shutting-down') {
@@ -59,7 +61,7 @@ export default function ShutdownScreen() {
         fontWeight: 600,
         letterSpacing: '0.02em',
       }}>
-        Shutting down...
+        {language === 'vi' ? 'Đang tắt máy...' : 'Shutting down...'}
       </div>
       
       <div style={{
@@ -67,7 +69,9 @@ export default function ShutdownScreen() {
         fontSize: 11,
         color: '#94a3b8',
       }}>
-        Saving session and ejecting USB drive safely
+        {language === 'vi' 
+          ? 'Đang lưu phiên làm việc và rút USB an toàn' 
+          : 'Saving session and ejecting USB drive safely'}
       </div>
     </motion.div>
   )

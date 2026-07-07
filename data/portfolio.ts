@@ -178,7 +178,7 @@ export const CERTIFICATES: Certificate[] = [
   { id: 'c1', name: 'TOEIC — Score 680', issuer: 'ETS (Educational Testing Service)', year: '2024' },
   { id: 'c2', name: 'HSK4 & HSKK Intermediate', issuer: 'Hanban / Confucius Institute', year: '2024' },
   { id: 'c3', name: 'Human Resource Management and Leadership Specialization', issuer: 'Coursera', year: '2025', verifyUrl: 'https://coursera.org/share/fb9ccc6f351ca18c604b0bf10ec59593' },
-  { id: 'c4', name: 'Information Systems Specialization', issuer: 'Coursera', year: '2025', verifyUrl: 'https://www.coursera.org/account/accomplishments/specialization/IIAHK60DI4GX' },
+  { id: 'c4', name: 'Information Systems Specialization', issuer: 'Coursera', year: '2025', verifyUrl: 'https://www.coursera.org/account/accomplishments/specialization/IIAHK60DI4GX?utm_source=link&utm_medium=certificate&utm_content=cert_image&utm_campaign=sharing_cta&utm_product=s12n' },
   { id: 'c5', name: 'UI / UX Design Specialization', issuer: 'Coursera', year: '2025', verifyUrl: 'https://coursera.org/share/547dd076c85a038954eda07eebe92265' },
   { id: 'c6', name: 'Social Media Marketing Specialization', issuer: 'Coursera', year: '2025', verifyUrl: 'https://coursera.org/share/e169c194ddcb633fb72b60cc8908d4ef' },
   { id: 'c7', name: 'Project Management Principles and Practices Specialization', issuer: 'Coursera', year: '2025', verifyUrl: 'https://coursera.org/share/d6185b88ec4b46e7e3aa337bc9d748ae' },

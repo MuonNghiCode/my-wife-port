@@ -4,6 +4,7 @@ import { motion, useDragControls } from 'framer-motion'
 import { X, Minus, Maximize2, ChevronLeft } from 'lucide-react'
 import { useDesktopStore } from '@/store/desktopStore'
 import { WindowState } from '@/types/portfolio.types'
+import { FOLDER_LABELS, UI_STRINGS } from '@/data/translations'
 
 interface WindowProps {
   window: WindowState
@@ -11,7 +12,8 @@ interface WindowProps {
 }
 
 export default function Window({ window: win, children }: WindowProps) {
-  const { closeWindow, minimizeWindow, maximizeWindow, focusWindow, updatePosition } = useDesktopStore()
+  const { closeWindow, minimizeWindow, maximizeWindow, focusWindow, updatePosition, language } = useDesktopStore()
+  const displayTitle = FOLDER_LABELS[language][win.folderId] || win.title
   const [isDragging, setIsDragging] = useState(false)
   const dragControls = useDragControls()
 
@@ -125,7 +127,7 @@ export default function Window({ window: win, children }: WindowProps) {
                   }}
                 >
                   <ChevronLeft size={22} />
-                  <span>Back</span>
+                  <span>{UI_STRINGS[language].back}</span>
                 </button>
                 
                 <div style={{
@@ -135,7 +137,7 @@ export default function Window({ window: win, children }: WindowProps) {
                   pointerEvents: 'none',
                   letterSpacing: '0.01em',
                 }}>
-                  {win.title}
+                  {displayTitle}
                 </div>
 
                 <button
@@ -151,7 +153,7 @@ export default function Window({ window: win, children }: WindowProps) {
                     minimizeWindow(win.id)
                   }}
                 >
-                  <span>Hide</span>
+                  <span>{UI_STRINGS[language].hide}</span>
                 </button>
               </>
             ) : (
@@ -266,7 +268,7 @@ export default function Window({ window: win, children }: WindowProps) {
                   pointerEvents: 'none',
                   letterSpacing: '0.02em',
                 }}>
-                  {win.title}
+                  {displayTitle}
                 </div>
 
                 <div style={{ width: 60 }} />

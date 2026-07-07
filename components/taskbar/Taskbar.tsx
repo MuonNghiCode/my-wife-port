@@ -11,17 +11,19 @@ import * as Icons from 'lucide-react'
 function Clock() {
   const [time, setTime] = useState('')
   const [date, setDate] = useState('')
+  const { language } = useDesktopStore()
 
   useEffect(() => {
     const update = () => {
       const now = new Date()
-      setTime(now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }))
-      setDate(now.toLocaleDateString('vi-VN', { weekday: 'short', month: 'short', day: 'numeric' }))
+      const locale = language === 'vi' ? 'vi-VN' : 'en-US'
+      setTime(now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }))
+      setDate(now.toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' }))
     }
     update()
     const t = setInterval(update, 1000)
     return () => clearInterval(t)
-  }, [])
+  }, [language])
 
   return (
     <div style={{ textAlign: 'right' }}>
@@ -37,7 +39,7 @@ function getIcon(name: string) {
 }
 
 export default function Taskbar() {
-  const { windows, restoreWindow, focusWindow, focusedWindowId, minimizeWindow } = useDesktopStore()
+  const { windows, restoreWindow, focusWindow, focusedWindowId, minimizeWindow, language, toggleLanguage } = useDesktopStore()
   const { isMuted, toggleMute, isPlaying, currentTrackIdx, setIsPlaying, setCurrentTrackIdx } = useSoundStore()
   const { setPhase } = useBootStore()
   
@@ -348,6 +350,28 @@ export default function Taskbar() {
           title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
         >
           {isDark ? <Sun size={16} /> : <Moon size={16} />}
+        </motion.button>
+
+        {/* Language Toggle Button */}
+        <motion.button
+          data-cursor="pointer"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={toggleLanguage}
+          style={{
+            background: 'none',
+            border: '1.5px solid var(--window-border)',
+            borderRadius: 6,
+            color: 'var(--text-primary)',
+            fontSize: 10,
+            fontWeight: 800,
+            padding: '3px 8px',
+            fontFamily: 'var(--font-mono), monospace',
+            cursor: 'none',
+          }}
+          title={language === 'en' ? "Đổi sang Tiếng Việt" : "Switch to English"}
+        >
+          {language.toUpperCase()}
         </motion.button>
 
         <Clock />

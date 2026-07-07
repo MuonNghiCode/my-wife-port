@@ -2,19 +2,52 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { CERTIFICATES } from '@/data/portfolio'
+import { useDesktopStore } from '@/store/desktopStore'
 import { Award, ExternalLink, ShieldCheck, Languages, GraduationCap, Calendar } from 'lucide-react'
 import { playSynthSound } from '@/store/soundStore'
 
+const CERT_TRANSLATIONS: Record<'en' | 'vi', Record<string, { name: string; issuer: string }>> = {
+  en: {
+    c1: { name: 'TOEIC — Score 680', issuer: 'ETS (Educational Testing Service)' },
+    c2: { name: 'HSK4 & HSKK Intermediate', issuer: 'Hanban / Confucius Institute' },
+    c3: { name: 'Human Resource Management and Leadership Specialization', issuer: 'Coursera' },
+    c4: { name: 'Information Systems Specialization', issuer: 'Coursera' },
+    c5: { name: 'UI / UX Design Specialization', issuer: 'Coursera' },
+    c6: { name: 'Social Media Marketing Specialization', issuer: 'Coursera' },
+    c7: { name: 'Project Management Principles and Practices Specialization', issuer: 'Coursera' }
+  },
+  vi: {
+    c1: { name: 'Chứng chỉ TOEIC — Điểm số 680', issuer: 'ETS (Educational Testing Service)' },
+    c2: { name: 'Chứng chỉ HSK4 & HSKK Trung cấp', issuer: 'Hanban / Viện Khổng Tử' },
+    c3: { name: 'Chuyên sâu Quản trị Nhân sự và Năng lực Lãnh đạo', issuer: 'Coursera' },
+    c4: { name: 'Chuyên sâu Hệ thống Thông tin', issuer: 'Coursera' },
+    c5: { name: 'Chuyên sâu Thiết kế Giao diện & Trải nghiệm Người dùng (UI/UX)', issuer: 'Coursera' },
+    c6: { name: 'Chuyên sâu Tiếp thị Mạng xã hội (Social Media Marketing)', issuer: 'Coursera' },
+    c7: { name: 'Chuyên sâu Nguyên lý và Thực tiễn Quản trị Dự án', issuer: 'Coursera' }
+  }
+}
+
 export default function CertificatesWindow() {
   const [filter, setFilter] = useState<'all' | 'specialization' | 'language'>('all')
+  const { language } = useDesktopStore()
 
   // Sort certificates by year descending (2025 then 2024)
   const sortedCerts = [...CERTIFICATES].sort((a, b) => parseInt(b.year) - parseInt(a.year))
 
+  // Map translations
+  const certsData = sortedCerts.map(cert => {
+    const translation = CERT_TRANSLATIONS[language][cert.id]
+    return {
+      ...cert,
+      name: translation ? translation.name : cert.name,
+      issuer: translation ? translation.issuer : cert.issuer,
+    }
+  })
+
   // Filter certificates
-  const filteredCerts = sortedCerts.filter(cert => {
+  const filteredCerts = certsData.filter(cert => {
     if (filter === 'all') return true
-    const isLanguage = cert.name.toLowerCase().includes('toeic') || cert.name.toLowerCase().includes('hsk')
+    const isLanguage = cert.id === 'c1' || cert.id === 'c2'
     if (filter === 'specialization') return !isLanguage
     if (filter === 'language') return isLanguage
     return true
@@ -60,10 +93,12 @@ export default function CertificatesWindow() {
           </div>
           <div>
             <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-              Credential Verification
+              {language === 'vi' ? 'Xác minh Chứng chỉ' : 'Credential Verification'}
             </h3>
             <p style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.4 }}>
-              All professional specializations and language certifications have been officially verified.
+              {language === 'vi' 
+                ? 'Tất cả các chứng chỉ chuyên môn và ngoại ngữ đều đã được xác minh chính thức.'
+                : 'All professional specializations and language certifications have been officially verified.'}
             </p>
           </div>
 
@@ -88,7 +123,9 @@ export default function CertificatesWindow() {
                 transition: 'all 0.2s ease',
               }}
             >
-              <span style={{ fontSize: 12.5, fontWeight: 700, color: filter === 'all' ? 'var(--blue-vivid)' : 'var(--text-secondary)' }}>Total Credentials</span>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: filter === 'all' ? 'var(--blue-vivid)' : 'var(--text-secondary)' }}>
+                {language === 'vi' ? 'Tổng số chứng chỉ' : 'Total Credentials'}
+              </span>
               <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--blue-vivid)' }}>7</span>
             </motion.button>
 
@@ -109,7 +146,9 @@ export default function CertificatesWindow() {
                 transition: 'all 0.2s ease',
               }}
             >
-              <span style={{ fontSize: 12.5, fontWeight: 700, color: filter === 'specialization' ? 'var(--orange-vivid)' : 'var(--text-secondary)' }}>Specializations</span>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: filter === 'specialization' ? 'var(--orange-vivid)' : 'var(--text-secondary)' }}>
+                {language === 'vi' ? 'Chuyên môn' : 'Specializations'}
+              </span>
               <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--orange-vivid)' }}>5</span>
             </motion.button>
 
@@ -130,7 +169,9 @@ export default function CertificatesWindow() {
                 transition: 'all 0.2s ease',
               }}
             >
-              <span style={{ fontSize: 12.5, fontWeight: 700, color: filter === 'language' ? 'var(--pink-vivid)' : 'var(--text-secondary)' }}>Languages</span>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: filter === 'language' ? 'var(--pink-vivid)' : 'var(--text-secondary)' }}>
+                {language === 'vi' ? 'Ngoại ngữ' : 'Languages'}
+              </span>
               <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--pink-vivid)' }}>2</span>
             </motion.button>
           </div>
@@ -147,7 +188,7 @@ export default function CertificatesWindow() {
             width: '100%', justifyContent: 'center',
           }}>
             <ShieldCheck size={14} />
-            <span>Verified digital records</span>
+            <span>{language === 'vi' ? 'Hồ sơ đã được xác minh' : 'Verified digital records'}</span>
           </div>
         </div>
       </div>
@@ -175,7 +216,7 @@ export default function CertificatesWindow() {
         {/* Timeline items */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {filteredCerts.map((cert, idx) => {
-            const isLanguage = cert.name.toLowerCase().includes('toeic') || cert.name.toLowerCase().includes('hsk')
+            const isLanguage = cert.id === 'c1' || cert.id === 'c2'
             const colorTheme = isLanguage ? 'var(--pink-vivid)' : 'var(--blue-vivid)'
             const softBg = isLanguage ? 'var(--pink-soft)' : 'var(--blue-soft)'
             const borderTheme = isLanguage ? 'var(--pink-bright)' : 'var(--blue-bright)'
@@ -266,7 +307,7 @@ export default function CertificatesWindow() {
                       fontSize: 11, fontWeight: 700, color: 'var(--text-muted)',
                     }}>
                       <Calendar size={12} />
-                      <span>Issued in {cert.year}</span>
+                      <span>{language === 'vi' ? `Cấp năm ${cert.year}` : `Issued in ${cert.year}`}</span>
                     </span>
 
                     {cert.verifyUrl && (
@@ -291,7 +332,7 @@ export default function CertificatesWindow() {
                         onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
                       >
                         <ExternalLink size={12} />
-                        <span>Verify Credentials</span>
+                        <span>{language === 'vi' ? 'Xác thực chứng chỉ' : 'Verify Credentials'}</span>
                       </a>
                     )}
                   </div>

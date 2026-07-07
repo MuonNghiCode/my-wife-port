@@ -2,15 +2,26 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { PROJECTS } from '@/data/portfolio'
+import { PROJECTS_VI } from '@/data/translations'
+import { useDesktopStore } from '@/store/desktopStore'
 import { ArrowLeft, Layers, Image as ImageIcon, Maximize2 } from 'lucide-react'
 import { playSynthSound } from '@/store/soundStore'
 
 type Category = 'all' | 'campaign' | 'strategy' | 'event'
-const CATEGORY_LABELS: Record<Category, string> = {
-  all: 'All Projects',
-  campaign: 'Integrated Campaigns',
-  strategy: 'Brand Strategy',
-  event: 'Event Management',
+
+const CATEGORY_LABELS: Record<'en' | 'vi', Record<Category, string>> = {
+  en: {
+    all: 'All Projects',
+    campaign: 'Integrated Campaigns',
+    strategy: 'Brand Strategy',
+    event: 'Event Management',
+  },
+  vi: {
+    all: 'Tất cả dự án',
+    campaign: 'Chiến dịch tích hợp',
+    strategy: 'Chiến lược thương hiệu',
+    event: 'Quản lý sự kiện',
+  }
 }
 
 interface BrandStyle {
@@ -56,6 +67,7 @@ interface ImageCarouselProps {
 
 function ImageCarousel({ images, title, height = '100%', onImageClick }: ImageCarouselProps) {
   const [activeIdx, setActiveIdx] = useState(0)
+  const { language } = useDesktopStore()
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -114,7 +126,7 @@ function ImageCarousel({ images, title, height = '100%', onImageClick }: ImageCa
         letterSpacing: '0.04em',
       }}>
         <Maximize2 size={11} />
-        <span>Click to view full image</span>
+        <span>{language === 'vi' ? 'Nhấn để xem ảnh lớn' : 'Click to view full image'}</span>
       </div>
 
       {/* Slide Navigation Overlay */}
@@ -247,6 +259,7 @@ interface ProjectDetailProps {
 }
 
 function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
+  const { language } = useDesktopStore()
   const imagesArray = project.images || [project.image]
   const brand = BRAND_STYLES[project.id] || BRAND_STYLES.p1
 
@@ -304,7 +317,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
           }}
         >
           <ArrowLeft size={13} />
-          <span>Back to Grid</span>
+          <span>{language === 'vi' ? 'Quay lại' : 'Back to Grid'}</span>
         </button>
 
         <ImageCarousel
@@ -341,7 +354,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
             borderRadius: 8,
             fontFamily: 'var(--font-ui), system-ui, sans-serif',
           }}>
-            {CATEGORY_LABELS[project.category as Category] || project.category}
+            {CATEGORY_LABELS[language][project.category as Category] || project.category}
           </span>
           
           <h2 style={{
@@ -368,7 +381,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
             margin: 0,
             fontFamily: 'var(--font-ui), system-ui, sans-serif',
           }}>
-            Strategic Briefing
+            {language === 'vi' ? 'Tóm tắt chiến lược' : 'Strategic Briefing'}
           </h4>
           <p style={{
             fontSize: 13,
@@ -401,7 +414,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
               letterSpacing: '0.06em',
               marginBottom: 4,
             }}>
-              Outcomes & Key Deliverables
+              {language === 'vi' ? 'Kết quả & Thành quả chính' : 'Outcomes & Key Deliverables'}
             </strong>
             {project.result}
           </div>
@@ -418,7 +431,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
             marginBottom: 10,
             fontFamily: 'var(--font-ui), system-ui, sans-serif',
           }}>
-            Marketing Stack
+            {language === 'vi' ? 'Công cụ Marketing' : 'Marketing Stack'}
           </h3>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {project.technologies.map(t => (
@@ -467,7 +480,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
             zIndex: 10,
           }}>
             <span style={{ color: '#fff', fontSize: 13, fontWeight: 700, fontFamily: 'var(--font-ui), system-ui, sans-serif' }}>
-              {project.title} &mdash; Uncropped High-Res View
+              {project.title} &mdash; {language === 'vi' ? 'Ảnh chất lượng cao' : 'Uncropped High-Res View'}
             </span>
             <button
               onClick={() => {
@@ -487,7 +500,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
                 fontFamily: 'var(--font-ui), system-ui, sans-serif',
               }}
             >
-              Close
+              {language === 'vi' ? 'Đóng' : 'Close'}
             </button>
           </div>
 
@@ -533,7 +546,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
                   fontWeight: 700,
                 }}
               >
-                ‹ Prev
+                {language === 'vi' ? '‹ Trước' : '‹ Prev'}
               </button>
               
               <span style={{
@@ -563,7 +576,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
                   fontWeight: 700,
                 }}
               >
-                Next ›
+                {language === 'vi' ? 'Tiếp ›' : 'Next ›'}
               </button>
             </div>
           )}
@@ -577,6 +590,7 @@ export default function ProjectsWindow() {
   const [filter, setFilter] = useState<Category>('all')
   const [selected, setSelected] = useState<typeof PROJECTS[0] | null>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const { language } = useDesktopStore()
 
   useEffect(() => {
     const checkMobile = () => {
@@ -587,7 +601,24 @@ export default function ProjectsWindow() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  const filtered = PROJECTS.filter(p => filter === 'all' || p.category === filter)
+  // Localized projects mapping
+  const projectsData = PROJECTS.map(p => {
+    if (language === 'vi') {
+      const translation = PROJECTS_VI.find(t => t.id === p.id)
+      if (translation) {
+        return {
+          ...p,
+          title: translation.title,
+          description: translation.description,
+          longDescription: translation.longDescription,
+          result: translation.result
+        }
+      }
+    }
+    return p
+  })
+
+  const filtered = projectsData.filter(p => filter === 'all' || p.category === filter)
   const categories: Category[] = ['all', 'campaign', 'strategy', 'event']
 
   const handleFilterClick = (cat: Category) => {
@@ -645,7 +676,7 @@ export default function ProjectsWindow() {
               fontFamily: 'var(--font-ui), system-ui, sans-serif',
             }}
           >
-            {CATEGORY_LABELS[cat]}
+            {CATEGORY_LABELS[language][cat]}
           </motion.button>
         ))}
       </div>
@@ -734,7 +765,7 @@ export default function ProjectsWindow() {
                       borderRadius: 8,
                       fontFamily: 'var(--font-ui), system-ui, sans-serif',
                     }}>
-                      {CATEGORY_LABELS[project.category as Category] || project.category}
+                      {CATEGORY_LABELS[language][project.category as Category] || project.category}
                     </span>
                   </div>
 
@@ -798,7 +829,7 @@ export default function ProjectsWindow() {
             padding: 48,
           }}>
             <Layers size={24} />
-            <span>No campaigns found in this category.</span>
+            <span>{language === 'vi' ? 'Không tìm thấy dự án nào trong mục này.' : 'No campaigns found in this category.'}</span>
           </div>
         )}
       </div>

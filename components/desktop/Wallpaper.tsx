@@ -23,13 +23,12 @@ export default function Wallpaper() {
     return () => observer.disconnect()
   }, [])
 
-  // Control video playback based on theme transitions (including smooth seeked-based reverse)
+  // Control video playback based on theme transitions
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
 
     let isDestroyed = false
-    let targetTime = video.currentTime
 
     // Handle initial state immediately on load without playing the transition
     if (isInitial.current) {
@@ -53,18 +52,6 @@ export default function Wallpaper() {
       }
     }
 
-    const handleSeeked = () => {
-      if (isDestroyed || isDark) return
-      if (targetTime <= 0) {
-        video.currentTime = 0
-        video.pause()
-      } else {
-        // Step backward by 0.15s, synchronized with decoder performance
-        targetTime = Math.max(0, targetTime - 0.15)
-        video.currentTime = targetTime
-      }
-    }
-
     if (isDark) {
       video.playbackRate = 2.5
       video.play().catch(() => {
@@ -72,16 +59,12 @@ export default function Wallpaper() {
       })
       requestAnimationFrame(checkForward)
     } else {
+      video.currentTime = 0
       video.pause()
-      video.addEventListener('seeked', handleSeeked)
-      // Trigger the first step backward
-      targetTime = Math.max(0, video.currentTime - 0.15)
-      video.currentTime = targetTime
     }
 
     return () => {
       isDestroyed = true
-      video.removeEventListener('seeked', handleSeeked)
     }
   }, [isDark])
 

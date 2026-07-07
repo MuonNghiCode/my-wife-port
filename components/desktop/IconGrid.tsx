@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { FOLDERS } from '@/data/portfolio'
+import { FOLDER_LABELS } from '@/data/translations'
 import { useDesktopStore } from '@/store/desktopStore'
 import * as Icons from 'lucide-react'
 
@@ -16,10 +17,11 @@ function getIcon(name: string) {
 }
 
 function FolderIcon({ folder, index, isMobile }: FolderIconProps) {
-  const { openWindow } = useDesktopStore()
+  const { openWindow, language } = useDesktopStore()
+  const label = FOLDER_LABELS[language][folder.id] || folder.label
 
   const handleOpen = () => {
-    openWindow(folder.id, folder.label, folder.id, folder.defaultSize)
+    openWindow(folder.id, label, folder.id, folder.defaultSize)
   }
 
   const isSecret = folder.id === 'secret'
@@ -90,7 +92,7 @@ function FolderIcon({ folder, index, isMobile }: FolderIconProps) {
         marginTop: 2,
         textShadow: isMobile ? '0 1px 2px var(--window-title-bg)' : 'none',
       }}>
-        {folder.label}
+        {label}
       </div>
     </motion.div>
   )

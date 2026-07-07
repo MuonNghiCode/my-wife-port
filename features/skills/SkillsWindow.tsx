@@ -1,13 +1,13 @@
 'use client'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-
+import { useDesktopStore } from '@/store/desktopStore'
 import { CheckCircle2, TrendingUp, Search, PenTool, Laptop, Globe, Star } from 'lucide-react'
 
 type Category = 'frontend' | 'backend' | 'database' | 'cloud' | 'tools'
 const CATEGORIES: Category[] = ['frontend', 'backend', 'database', 'cloud', 'tools']
 
-const CONSTELLATION_DATA: Record<Category, {
+const CONSTELLATION_DATA_EN: Record<Category, {
   label: string
   color: string
   x: string
@@ -64,8 +64,68 @@ const CONSTELLATION_DATA: Record<Category, {
   }
 }
 
+const CONSTELLATION_DATA_VI: Record<Category, {
+  label: string
+  color: string
+  x: string
+  y: string
+  skills: Array<{ label: string; x: string; y: string }>
+}> = {
+  frontend: {
+    label: 'Lập kế hoạch chiến lược',
+    color: 'var(--orange-vivid)',
+    x: '28%', y: '28%',
+    skills: [
+      { label: 'Lập kế hoạch chiến lược', x: '12%', y: '16%' },
+      { label: 'Quản lý dự án & Sự kiện', x: '15%', y: '42%' },
+      { label: 'Nhận diện thương hiệu & Hình ảnh', x: '36%', y: '16%' }
+    ]
+  },
+  backend: {
+    label: 'SEO & Content Marketing',
+    color: 'var(--blue-vivid)',
+    x: '72%', y: '28%',
+    skills: [
+      { label: 'Viết bài chuẩn SEO', x: '58%', y: '16%' },
+      { label: 'Quản lý mạng xã hội', x: '88%', y: '16%' },
+      { label: 'Tương tác cộng đồng & Seeding', x: '60%', y: '42%' },
+      { label: 'Tối ưu hóa On-page & Công cụ SEO', x: '86%', y: '42%' }
+    ]
+  },
+  database: {
+    label: 'Thiết kế & Tư duy thiết kế',
+    color: 'var(--pink-vivid)',
+    x: '50%', y: '56%',
+    skills: [
+      { label: 'Thiết kế UI / UX', x: '35%', y: '68%' },
+      { label: 'Thiết kế đồ họa & Ấn phẩm', x: '65%', y: '68%' }
+    ]
+  },
+  cloud: {
+    label: 'Công cụ & Phân tích',
+    color: '#10b981',
+    x: '24%', y: '72%',
+    skills: [
+      { label: 'Canva / Microsoft PowerPoint', x: '10%', y: '84%' },
+      { label: 'Tin học văn phòng (Word/Excel)', x: '38%', y: '84%' }
+    ]
+  },
+  tools: {
+    label: 'Ngoại ngữ & Kỹ năng mềm',
+    color: '#8b5cf6',
+    x: '76%', y: '72%',
+    skills: [
+      { label: 'Quan hệ khách hàng & Cộng đồng', x: '58%', y: '84%' },
+      { label: 'Ngoại ngữ (Tiếng Anh & Tiếng Trung)', x: '88%', y: '84%' }
+    ]
+  }
+}
+
 export default function SkillsWindow() {
   const [hoveredCategory, setHoveredCategory] = useState<Category | null>(null)
+  const { language } = useDesktopStore()
+
+  const constellationData = language === 'vi' ? CONSTELLATION_DATA_VI : CONSTELLATION_DATA_EN
 
   const getCategoryIcon = (cat: Category, color: string) => {
     const size = 16
@@ -90,7 +150,6 @@ export default function SkillsWindow() {
       flexDirection: 'column',
       position: 'relative',
     }}>
-
 
       {/* Main Interactive Canvas Area */}
       <div className="constellation-canvas-wrapper" style={{
@@ -120,7 +179,7 @@ export default function SkillsWindow() {
 
           {/* Central Star to Categories Connections */}
           {CATEGORIES.map((cat) => {
-            const catData = CONSTELLATION_DATA[cat]
+            const catData = constellationData[cat]
             const isHighlighted = hoveredCategory === null || hoveredCategory === cat
             const color = isHighlighted ? catData.color : 'var(--window-border)'
             const opacity = hoveredCategory === cat ? 0.8 : hoveredCategory === null ? 0.35 : 0.1
@@ -144,7 +203,7 @@ export default function SkillsWindow() {
 
           {/* Categories to Skills Connections */}
           {CATEGORIES.map((cat) => {
-            const catData = CONSTELLATION_DATA[cat]
+            const catData = constellationData[cat]
             return catData.skills.map((skill, si) => {
               const isHighlighted = hoveredCategory === null || hoveredCategory === cat
               const color = isHighlighted ? catData.color : 'var(--window-border)'
@@ -200,13 +259,13 @@ export default function SkillsWindow() {
               border: '1px solid var(--window-border)',
               whiteSpace: 'nowrap',
             }}>
-              Core
+              {language === 'vi' ? 'Cốt lõi' : 'Core'}
             </span>
           </div>
 
           {/* Render Category Nodes (Static positioning for pixel-perfect line alignment) */}
           {CATEGORIES.map((cat) => {
-            const catData = CONSTELLATION_DATA[cat]
+            const catData = constellationData[cat]
             const isHighlighted = hoveredCategory === null || hoveredCategory === cat
             const opacity = hoveredCategory === cat ? 1 : hoveredCategory === null ? 0.95 : 0.35
 
@@ -260,7 +319,7 @@ export default function SkillsWindow() {
 
           {/* Render Skill Nodes (Static positioning for pixel-perfect line alignment) */}
           {CATEGORIES.map((cat) => {
-            const catData = CONSTELLATION_DATA[cat]
+            const catData = constellationData[cat]
             return catData.skills.map((skill) => {
               const skillIsHighlighted = hoveredCategory === null || hoveredCategory === cat
               const skillOpacity = hoveredCategory === cat ? 1 : hoveredCategory === null ? 0.9 : 0.15
@@ -339,7 +398,7 @@ export default function SkillsWindow() {
       {/* Mobile Stack fallback (only visible on mobile width) */}
       <div className="expertise-mobile-list">
         {CATEGORIES.map((cat) => {
-          const catData = CONSTELLATION_DATA[cat]
+          const catData = constellationData[cat]
           return (
             <div key={cat} style={{
               background: 'var(--bg-glass)',

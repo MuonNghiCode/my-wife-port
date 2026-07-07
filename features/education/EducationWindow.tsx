@@ -1,10 +1,34 @@
 'use client'
 import { motion } from 'framer-motion'
 import { EDUCATION } from '@/data/portfolio'
+import { EDUCATION_VI } from '@/data/translations'
+import { useDesktopStore } from '@/store/desktopStore'
 import { Calendar, BookOpen, Award, CheckCircle, Star } from 'lucide-react'
 
 export default function EducationWindow() {
+  const { language } = useDesktopStore()
   const edu = EDUCATION[0] // Since there is only one education block (FPT University)
+
+  const institution = language === 'vi' ? EDUCATION_VI.institution : edu.institution
+  const degree = language === 'vi' ? EDUCATION_VI.degree : edu.degree
+  const field = language === 'vi' ? EDUCATION_VI.field : edu.field
+  const activities = language === 'vi' ? EDUCATION_VI.activities : edu.activities
+
+  const focusAreas = language === 'vi' ? [
+    'Chiến lược Tiếp thị Số',
+    'Tối ưu hóa SEO & Nội dung',
+    'Quản trị Mạng xã hội',
+    'Nghiên cứu thị trường & Insight',
+    'Tổ chức sự kiện & Thương hiệu',
+    'Giải quyết vấn đề Sáng tạo',
+  ] : [
+    'Digital Marketing Strategy',
+    'SEO & Content Optimization',
+    'Social Media Management',
+    'Market Research & Insights',
+    'Event Organizing & Branding',
+    'Creative Problem Solving',
+  ]
 
   return (
     <div style={{
@@ -77,7 +101,7 @@ export default function EducationWindow() {
             margin: '0 0 6px 0',
             letterSpacing: '-0.3px',
           }}>
-            {edu.institution}
+            {institution}
           </h3>
 
           <p style={{
@@ -86,7 +110,7 @@ export default function EducationWindow() {
             color: 'var(--text-secondary)',
             margin: '0 0 4px 0',
           }}>
-            {edu.degree}
+            {degree}
           </p>
 
           <p style={{
@@ -97,7 +121,7 @@ export default function EducationWindow() {
             textTransform: 'uppercase',
             letterSpacing: '0.04em',
           }}>
-            {edu.field}
+            {field}
           </p>
 
           {/* Timeline & GPA Badges */}
@@ -173,11 +197,11 @@ export default function EducationWindow() {
                 letterSpacing: '0.12em',
                 margin: 0,
               }}>
-                Activities & Leadership
+                {language === 'vi' ? 'Hoạt động & Lãnh đạo' : 'Activities & Leadership'}
               </h3>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {edu.activities?.map((act, idx) => (
+              {activities?.map((act, idx) => (
                 <div
                   key={idx}
                   style={{
@@ -212,7 +236,7 @@ export default function EducationWindow() {
                 letterSpacing: '0.12em',
                 margin: 0,
               }}>
-                Key Areas of Focus
+                {language === 'vi' ? 'Lĩnh vực tập trung chính' : 'Key Areas of Focus'}
               </h3>
             </div>
             <div style={{
@@ -220,14 +244,7 @@ export default function EducationWindow() {
               flexWrap: 'wrap',
               gap: 8,
             }}>
-              {[
-                'Digital Marketing Strategy',
-                'SEO & Content Optimization',
-                'Social Media Management',
-                'Market Research & Insights',
-                'Event Organizing & Branding',
-                'Creative Problem Solving',
-              ].map((focus, idx) => (
+              {focusAreas.map((focus, idx) => (
                 <div
                   key={idx}
                   style={{

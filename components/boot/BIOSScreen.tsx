@@ -2,19 +2,32 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useBootStore } from '@/store/bootStore'
+import { useDesktopStore } from '@/store/desktopStore'
 import { playSynthSound } from '@/store/soundStore'
 import { OWNER } from '@/data/portfolio'
+import { OWNER_VI } from '@/data/translations'
 
-const LOADING_MESSAGES = [
+const LOADING_MESSAGES_EN = [
   'Loading your story...',
   'Brewing something beautiful...',
   'Arranging the details...',
   'Almost ready...',
 ]
 
+const LOADING_MESSAGES_VI = [
+  'Đang tải câu chuyện...',
+  'Chuẩn bị điều thú vị...',
+  'Sắp xếp các chi tiết...',
+  'Sắp hoàn thành...',
+]
+
 export default function BIOSScreen() {
   const { phase, setPhase } = useBootStore()
+  const { language } = useDesktopStore()
   const [msgIdx, setMsgIdx] = useState(0)
+
+  const loadingMessages = language === 'vi' ? LOADING_MESSAGES_VI : LOADING_MESSAGES_EN
+  const roleText = language === 'vi' ? OWNER_VI.role : OWNER.role
 
   useEffect(() => {
     if (phase !== 'bios') return
@@ -25,7 +38,7 @@ export default function BIOSScreen() {
 
     const interval = setInterval(() => {
       setMsgIdx(i => {
-        if (i < LOADING_MESSAGES.length - 1) return i + 1
+        if (i < loadingMessages.length - 1) return i + 1
         clearInterval(interval)
         return i
       })
@@ -33,7 +46,7 @@ export default function BIOSScreen() {
 
     const t = setTimeout(() => setPhase('loading'), 2400)
     return () => { clearTimeout(t); clearInterval(interval) }
-  }, [phase, setPhase])
+  }, [phase, setPhase, loadingMessages.length])
 
   return (
     <AnimatePresence>
@@ -89,7 +102,7 @@ export default function BIOSScreen() {
               letterSpacing: '0.12em',
               textTransform: 'uppercase', fontWeight: 600,
             }}>
-              {OWNER.role}
+              {roleText}
             </div>
           </motion.div>
 
@@ -102,7 +115,7 @@ export default function BIOSScreen() {
           >
             <AnimatePresence mode="wait">
               <motion.div
-                key={msgIdx}
+                key={`${language}-${msgIdx}`}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
@@ -114,7 +127,7 @@ export default function BIOSScreen() {
                   fontWeight: 500,
                 }}
               >
-                {LOADING_MESSAGES[msgIdx]}
+                {loadingMessages[msgIdx]}
               </motion.div>
             </AnimatePresence>
           </motion.div>

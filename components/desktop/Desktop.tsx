@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useBootStore } from '@/store/bootStore'
 import { useDesktopStore } from '@/store/desktopStore'
 import { FOLDERS } from '@/data/portfolio'
+import { FOLDER_LABELS, UI_STRINGS } from '@/data/translations'
 import { playSynthSound, useSoundStore, TRACKS } from '@/store/soundStore'
 import Wallpaper from './Wallpaper'
 import IconGrid from './IconGrid'
@@ -15,15 +16,18 @@ import { User, Music, Globe, Mail, Wifi, Battery, Power, Moon, Sun } from 'lucid
 // Simple Clock for Mobile Status Bar
 function MobileClock() {
   const [time, setTime] = useState('')
+  const { language } = useDesktopStore()
+
   useEffect(() => {
     const update = () => {
       const now = new Date()
-      setTime(now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false }))
+      const locale = language === 'vi' ? 'vi-VN' : 'en-US'
+      setTime(now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false }))
     }
     update()
     const t = setInterval(update, 1000)
     return () => clearInterval(t)
-  }, [])
+  }, [language])
   return <span>{time}</span>
 }
 
@@ -31,17 +35,19 @@ function MobileClock() {
 function DesktopWidgetClock() {
   const [time, setTime] = useState('')
   const [date, setDate] = useState('')
+  const { language } = useDesktopStore()
   
   useEffect(() => {
     const update = () => {
       const now = new Date()
-      setTime(now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false }))
-      setDate(now.toLocaleDateString('vi-VN', { weekday: 'long', month: 'long', day: 'numeric' }))
+      const locale = language === 'vi' ? 'vi-VN' : 'en-US'
+      setTime(now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false }))
+      setDate(now.toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric' }))
     }
     update()
     const t = setInterval(update, 1000)
     return () => clearInterval(t)
-  }, [])
+  }, [language])
 
   return (
     <div style={{
@@ -63,7 +69,7 @@ function DesktopWidgetClock() {
         letterSpacing: '0.1em',
         textTransform: 'uppercase',
       }}>
-        System Time
+        {UI_STRINGS[language].systemTime}
       </div>
       <div style={{
         fontSize: 40,
@@ -88,6 +94,19 @@ function DesktopWidgetClock() {
 
 // Cozy Sticky Note Widget for Desktop Background
 function DesktopStickyNote() {
+  const { language } = useDesktopStore()
+  const todos = language === 'vi' ? [
+    { done: true, text: 'Ra mắt chiến dịch thương hiệu' },
+    { done: true, text: 'Thu thập seeding influencer' },
+    { done: false, text: 'Bản thảo sáng tạo nội dung' },
+    { done: false, text: 'Họp cà phê cùng đội ngũ' },
+  ] : [
+    { done: true, text: 'Launch brand relaunch campaign' },
+    { done: true, text: 'Influencer seeding collection' },
+    { done: false, text: 'Creative storytelling draft' },
+    { done: false, text: 'Coffee meeting with team' },
+  ]
+
   return (
     <motion.div
       whileHover={{ rotate: 0, scale: 1.02 }}
@@ -113,15 +132,10 @@ function DesktopStickyNote() {
         letterSpacing: '0.1em',
         textTransform: 'uppercase',
       }}>
-        Workspace Tasks
+        {UI_STRINGS[language].workspaceTasks}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {[
-          { done: true, text: 'Launch brand relaunch campaign' },
-          { done: true, text: 'Influencer seeding collection' },
-          { done: false, text: 'Creative storytelling draft' },
-          { done: false, text: 'Coffee meeting with team' },
-        ].map((todo, idx) => (
+        {todos.map((todo, idx) => (
           <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12 }}>
             <div style={{
               width: 14, height: 14, borderRadius: 4,
@@ -149,7 +163,7 @@ function DesktopStickyNote() {
 
 export default function Desktop() {
   const { phase, setPhase } = useBootStore()
-  const { windows, openWindow, restoreWindow } = useDesktopStore()
+  const { windows, openWindow, restoreWindow, language } = useDesktopStore()
   const { isPlaying, currentTrackIdx } = useSoundStore()
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -362,11 +376,12 @@ export default function Desktop() {
                   const isMusic = app.id === 'music'
                   const isBrowser = app.id === 'browser'
                   const isContact = app.id === 'contact'
+                  const appLabel = FOLDER_LABELS[language][app.id] || app.label
 
                   return (
                     <motion.button
                       key={app.id}
-                      onClick={() => handleDockClick(app.id, app.label, app.defaultSize)}
+                      onClick={() => handleDockClick(app.id, appLabel, app.defaultSize)}
                       whileTap={{ scale: 0.88 }}
                       style={{
                         width: 50, height: 50, borderRadius: 13,

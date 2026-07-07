@@ -3,8 +3,10 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Building2, Calendar, CheckCircle2 } from 'lucide-react'
 import { playSynthSound } from '@/store/soundStore'
+import { useDesktopStore } from '@/store/desktopStore'
+import { EXPERIENCES_VI } from '@/data/translations'
 
-const CHAPTERS = [
+const CHAPTERS_EN = [
   {
     id: 'e1',
     chapter: 1,
@@ -67,9 +69,60 @@ const CHAPTERS = [
   }
 ]
 
+const CHAPTERS_VI = [
+  {
+    id: 'e1',
+    chapter: 1,
+    companyAbbr: EXPERIENCES_VI[0].companyAbbr,
+    role: EXPERIENCES_VI[0].role,
+    company: EXPERIENCES_VI[0].company,
+    period: '2022 — 2024',
+    narrative: EXPERIENCES_VI[0].narrative,
+    description: EXPERIENCES_VI[0].description,
+    technologies: ['Social Media Marketing', 'Community Management', 'Content Planning', 'Team Collaboration', 'Customer Engagement'],
+    color: '#8b5cf6',
+    bg: 'rgba(139, 92, 246, 0.03)',
+    border: 'rgba(139, 92, 246, 0.2)',
+    badgeBg: 'rgba(139, 92, 246, 0.1)',
+  },
+  {
+    id: 'e2',
+    chapter: 2,
+    companyAbbr: EXPERIENCES_VI[1].companyAbbr,
+    role: EXPERIENCES_VI[1].role,
+    company: EXPERIENCES_VI[1].company,
+    period: '2025',
+    narrative: EXPERIENCES_VI[1].narrative,
+    description: EXPERIENCES_VI[1].description,
+    technologies: ['SEO Content', 'Keyword Research', 'Hot Search', 'Travel & Finance Content', 'Team Collaboration'],
+    color: '#eab308',
+    bg: 'rgba(234, 179, 8, 0.03)',
+    border: 'rgba(234, 179, 8, 0.2)',
+    badgeBg: 'rgba(234, 179, 8, 0.1)',
+  },
+  {
+    id: 'e3',
+    chapter: 3,
+    companyAbbr: EXPERIENCES_VI[2].companyAbbr,
+    role: EXPERIENCES_VI[2].role,
+    company: EXPERIENCES_VI[2].company,
+    period: '2025 — Present',
+    narrative: EXPERIENCES_VI[2].narrative,
+    description: EXPERIENCES_VI[2].description,
+    technologies: ['SEO Writing', 'Keyword Research', 'Making Post Images', 'Top Search', 'Tech & Finance Content'],
+    color: '#ef4444',
+    bg: 'rgba(239, 68, 68, 0.03)',
+    border: 'rgba(239, 68, 68, 0.2)',
+    badgeBg: 'rgba(239, 68, 68, 0.1)',
+  }
+]
+
 export default function ExperienceWindow() {
+  const { language } = useDesktopStore()
   const [activeIdx, setActiveIdx] = useState(2) // Default to latest (Chapter 3)
-  const currentChapter = CHAPTERS[activeIdx]
+  
+  const chapters = language === 'vi' ? CHAPTERS_VI : CHAPTERS_EN
+  const currentChapter = chapters[activeIdx]
 
   return (
     <div style={{
@@ -91,7 +144,7 @@ export default function ExperienceWindow() {
       }}>
         <AnimatePresence mode="wait">
           <motion.div
-            key={currentChapter.chapter}
+            key={`${language}-${currentChapter.chapter}`}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
@@ -120,7 +173,7 @@ export default function ExperienceWindow() {
                   textTransform: 'uppercase',
                   letterSpacing: '0.12em',
                 }}>
-                  {currentChapter.period} Timeline
+                  {currentChapter.period} {language === 'vi' ? 'Lộ trình' : 'Timeline'}
                 </span>
                 <h2 style={{
                   fontSize: 20,
@@ -175,7 +228,7 @@ export default function ExperienceWindow() {
                 letterSpacing: '0.08em',
                 margin: 0,
               }}>
-                Key Responsibilities & Impact
+                {language === 'vi' ? 'Nhiệm vụ trọng tâm & Tác động' : 'Key Responsibilities & Impact'}
               </h4>
               <ul style={{ paddingLeft: 0, listStyle: 'none', margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {currentChapter.description.map((d, di) => (
@@ -220,7 +273,7 @@ export default function ExperienceWindow() {
         flexShrink: 0,
         paddingTop: 4,
       }}>
-        {CHAPTERS.map((ch, idx) => {
+        {chapters.map((ch, idx) => {
           const isActive = activeIdx === idx
           const textActiveColor = isActive ? ch.color : 'var(--text-secondary)'
 

@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useDesktopStore } from '@/store/desktopStore'
 import { Lock, Eye, ExternalLink, Mail, Heart } from 'lucide-react'
 import { playSynthSound } from '@/store/soundStore'
 
@@ -27,6 +28,7 @@ export default function SecretWindow() {
   const [unlocked, setUnlocked] = useState(false)
   const [input, setInput] = useState('')
   const [isMobile, setIsMobile] = useState(false)
+  const { language } = useDesktopStore()
 
   // 3D Mouse Tracker state
   const [rotateX, setRotateX] = useState(0)
@@ -107,10 +109,12 @@ export default function SecretWindow() {
               <Lock size={40} color="var(--text-primary)" style={{ margin: '0 auto', opacity: 0.8 }} />
             </motion.div>
             <h2 style={{ fontSize: 18, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8, letterSpacing: '-0.3px' }}>
-              System Authentication
+              {language === 'vi' ? 'Xác thực hệ thống' : 'System Authentication'}
             </h2>
             <p style={{ fontSize: 12.5, color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: 24, fontWeight: 500 }}>
-              Enter the password to access the developer workstation dashboard.
+              {language === 'vi'
+                ? 'Nhập mật khẩu để truy cập trang điều khiển máy trạm lập trình viên.'
+                : 'Enter the password to access the developer workstation dashboard.'}
             </p>
             
             <div style={{ display: 'flex', gap: 8 }}>
@@ -118,7 +122,7 @@ export default function SecretWindow() {
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleUnlock()}
-                placeholder="Password..."
+                placeholder={language === 'vi' ? 'Mật khẩu...' : 'Password...'}
                 type="password"
                 style={{
                   flex: 1,
@@ -155,7 +159,9 @@ export default function SecretWindow() {
             </div>
             
             <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 14, fontFamily: 'var(--font-mono)', fontWeight: 500 }}>
-              Hint: think about this website&apos;s purpose... 
+              {language === 'vi'
+                ? 'Gợi ý: nghĩ về mục đích của trang web này...'
+                : 'Hint: think about this website\'s purpose...'}
             </div>
           </motion.div>
         </div>
@@ -245,7 +251,7 @@ export default function SecretWindow() {
                 display: 'block',
                 marginBottom: 6,
               }}>
-                Workstation Creator
+                {language === 'vi' ? 'Người thiết kế máy trạm' : 'Workstation Creator'}
               </span>
               <h1 style={{
                 fontSize: 23,
@@ -255,7 +261,9 @@ export default function SecretWindow() {
                 color: 'var(--text-primary)',
                 margin: 0,
               }}>
-                I am MuonNghiCode, the engineer who designed and built this portfolio experience.
+                {language === 'vi'
+                  ? 'Tôi là MuonNghiCode, lập trình viên đã thiết kế và xây dựng trang portfolio này.'
+                  : 'I am MuonNghiCode, the engineer who designed and built this portfolio experience.'}
               </h1>
             </div>
 
@@ -266,21 +274,27 @@ export default function SecretWindow() {
               lineHeight: 1.7,
               margin: 0,
             }}>
-              I created this interactive OS workstation simulator to present digital campaigns and web development projects in a memorable, hands-on format. My work focuses on building fast, responsive, and pixel-perfect applications using React, Next.js, and TypeScript.
+              {language === 'vi'
+                ? 'Tôi xây dựng trình mô phỏng máy trạm hệ điều hành này nhằm mục đích giới thiệu các chiến dịch tiếp thị số và các dự án phát triển web theo cách tương tác trực quan và đáng nhớ nhất. Định hướng chính của tôi là tạo ra các ứng dụng web tốc độ cao, mượt mà và chuẩn thiết kế sử dụng React, Next.js và TypeScript.'
+                : 'I created this interactive OS workstation simulator to present digital campaigns and web development projects in a memorable, hands-on format. My work focuses on building fast, responsive, and pixel-perfect applications using React, Next.js, and TypeScript.'}
             </p>
 
             {/* Core Capabilities */}
             <div>
               <h3 style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: 14 }}>
-                Core Focus
+                {language === 'vi' ? 'Lĩnh vực tập trung' : 'Core Focus'}
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <strong style={{ fontSize: 13, color: 'var(--text-primary)' }}>Front-end Engineering</strong>
+                  <strong style={{ fontSize: 13, color: 'var(--text-primary)' }}>
+                    {language === 'vi' ? 'Lập trình Front-end' : 'Front-end Engineering'}
+                  </strong>
                   <span style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Next.js, React, TypeScript, Tailwind CSS</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <strong style={{ fontSize: 13, color: 'var(--text-primary)' }}>Full-stack Solutions</strong>
+                  <strong style={{ fontSize: 13, color: 'var(--text-primary)' }}>
+                    {language === 'vi' ? 'Giải pháp Full-stack' : 'Full-stack Solutions'}
+                  </strong>
                   <span style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Node.js, Express, REST APIs, MongoDB</span>
                 </div>
               </div>
@@ -289,13 +303,15 @@ export default function SecretWindow() {
             {/* Selected Work List (Borderless links) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, borderTop: '1px solid var(--window-border)', paddingTop: 24 }}>
               <h3 style={{ fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)' }}>
-                Selected Creations
+                {language === 'vi' ? 'Sản phẩm chọn lọc' : 'Selected Creations'}
               </h3>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <strong style={{ fontSize: 13.5, color: 'var(--text-primary)' }}>Personal Workstation Portfolio</strong>
+                    <strong style={{ fontSize: 13.5, color: 'var(--text-primary)' }}>
+                      {language === 'vi' ? 'Portfolio Máy trạm Cá nhân' : 'Personal Workstation Portfolio'}
+                    </strong>
                     <a
                       href="https://my-wife-port.vercel.app/"
                       target="_blank"
@@ -316,13 +332,17 @@ export default function SecretWindow() {
                     </a>
                   </div>
                   <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: '4px 0 0 0', lineHeight: 1.5 }}>
-                    An interactive OS simulator designed to showcase brand strategies and digital marketing materials. Next.js &bull; TypeScript &bull; Framer Motion
+                    {language === 'vi'
+                      ? 'Trình giả lập hệ điều hành tương tác được thiết kế để giới thiệu chiến lược thương hiệu và nội dung tiếp thị số. Next.js • TypeScript • Framer Motion'
+                      : 'An interactive OS simulator designed to showcase brand strategies and digital marketing materials. Next.js • TypeScript • Framer Motion'}
                   </p>
                 </div>
 
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <strong style={{ fontSize: 13.5, color: 'var(--text-primary)' }}>Coway E-commerce</strong>
+                    <strong style={{ fontSize: 13.5, color: 'var(--text-primary)' }}>
+                      {language === 'vi' ? 'Thương mại điện tử Coway' : 'Coway E-commerce'}
+                    </strong>
                     <a
                       href="https://coway-sigma.vercel.app/"
                       target="_blank"
@@ -343,7 +363,9 @@ export default function SecretWindow() {
                     </a>
                   </div>
                   <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: '4px 0 0 0', lineHeight: 1.5 }}>
-                    Modern e-commerce platform featuring intelligent product recommendations and seamless user experience. React &bull; TypeScript &bull; Tailwind
+                    {language === 'vi'
+                      ? 'Nền tảng thương mại điện tử hiện đại có tính năng đề xuất sản phẩm thông minh và trải nghiệm người dùng liền mạch. React • TypeScript • Tailwind'
+                      : 'Modern e-commerce platform featuring intelligent product recommendations and seamless user experience. React • TypeScript • Tailwind'}
                   </p>
                 </div>
               </div>
@@ -404,9 +426,15 @@ export default function SecretWindow() {
                 flexWrap: 'wrap',
                 gap: 8,
               }}>
-                <span>Master the fundamentals, embrace the new, never stop learning.</span>
+                <span>
+                  {language === 'vi'
+                    ? 'Nắm vững nền tảng, đón nhận điều mới, không ngừng học hỏi.'
+                    : 'Master the fundamentals, embrace the new, never stop learning.'}
+                </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span>Crafted by MuonNghiCode with</span>
+                  <span>
+                    {language === 'vi' ? 'Được thiết kế bởi MuonNghiCode với' : 'Crafted by MuonNghiCode with'}
+                  </span>
                   <Heart size={10} style={{ fill: 'var(--text-muted)', stroke: 'none' }} />
                 </span>
               </div>

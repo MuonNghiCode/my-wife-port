@@ -2,6 +2,7 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useBootStore } from '@/store/bootStore'
+import { useDesktopStore } from '@/store/desktopStore'
 import { playSynthSound } from '@/store/soundStore'
 import USBScene from '@/components/usb/USBScene'
 import BIOSScreen from '@/components/boot/BIOSScreen'
@@ -13,6 +14,19 @@ import ShutdownScreen from '@/components/boot/ShutdownScreen'
 
 export default function PortfolioApp() {
   const { phase } = useBootStore()
+  const { language } = useDesktopStore()
+
+  // Update HTML element attributes for Vietnamese font fallback support
+  useEffect(() => {
+    document.documentElement.setAttribute('data-lang', language)
+    if (language === 'vi') {
+      document.documentElement.classList.add('lang-vi')
+      document.documentElement.classList.remove('lang-en')
+    } else {
+      document.documentElement.classList.add('lang-en')
+      document.documentElement.classList.remove('lang-vi')
+    }
+  }, [language])
 
   // Register keyboard & global sound listeners
   useEffect(() => {

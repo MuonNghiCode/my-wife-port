@@ -5,10 +5,12 @@ import { useBootStore } from '@/store/bootStore'
 import { playSynthSound, useSoundStore } from '@/store/soundStore'
 import { useDesktopStore } from '@/store/desktopStore'
 import { OWNER } from '@/data/portfolio'
+import { OWNER_VI } from '@/data/translations'
 import { ArrowRight, Power, Wifi, Battery, Moon } from 'lucide-react'
 
 export default function LoginScreen() {
   const { phase, setPhase } = useBootStore()
+  const { language } = useDesktopStore()
   
   // Real-time Clock states
   const [time, setTime] = useState('')
@@ -19,8 +21,9 @@ export default function LoginScreen() {
   useEffect(() => {
     const update = () => {
       const now = new Date()
-      setTime(now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false }))
-      setDate(now.toLocaleDateString('vi-VN', { weekday: 'long', month: 'long', day: 'numeric' }))
+      const locale = language === 'vi' ? 'vi-VN' : 'en-US'
+      setTime(now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false }))
+      setDate(now.toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric' }))
     }
     update()
     const t = setInterval(update, 1000)
@@ -35,7 +38,7 @@ export default function LoginScreen() {
       clearInterval(t)
       window.removeEventListener('resize', checkMobile)
     }
-  }, [])
+  }, [language])
 
   const handleLogin = useCallback(() => {
     playSynthSound('login')
@@ -87,6 +90,8 @@ export default function LoginScreen() {
   }, [phase, handleLogin])
 
   if (phase !== 'login') return null
+
+  const roleText = language === 'vi' ? OWNER_VI.role : OWNER.role
 
   return (
     <AnimatePresence>
@@ -227,7 +232,7 @@ export default function LoginScreen() {
                   fontWeight: 600,
                   margin: '4px 0 0 0',
                 }}>
-                  {OWNER.role}
+                  {roleText}
                 </p>
               </div>
 
@@ -255,7 +260,7 @@ export default function LoginScreen() {
                   marginTop: 6,
                 }}
               >
-                <span>Đăng nhập</span>
+                <span>{language === 'vi' ? 'Đăng nhập' : 'Sign In'}</span>
                 <ArrowRight size={14} />
               </motion.button>
 
@@ -268,7 +273,9 @@ export default function LoginScreen() {
                   fontWeight: 500,
                   marginTop: 2,
                 }}>
-                  Bấm nút Đăng nhập hoặc nhấn phím Enter để tiếp tục
+                  {language === 'vi' 
+                    ? 'Bấm nút Đăng nhập hoặc nhấn phím Enter để tiếp tục' 
+                    : 'Click the Sign In button or press Enter to continue'}
                 </div>
               )}
             </motion.div>
@@ -357,7 +364,7 @@ export default function LoginScreen() {
                     cursor: 'none',
                     transition: 'color 0.2s',
                   }}
-                  title="Shutdown System"
+                  title={language === 'vi' ? 'Tắt nguồn hệ thống' : 'Shutdown System'}
                 >
                   <Power size={18} />
                 </motion.button>

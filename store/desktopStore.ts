@@ -15,6 +15,8 @@ interface DesktopStore {
   focusWindow: (id: string) => void
   updatePosition: (id: string, pos: { x: number; y: number }) => void
   updateSize: (id: string, size: { width: number; height: number }) => void
+  language: 'en' | 'vi'
+  toggleLanguage: () => void
 }
 
 const getDefaultPosition = (index: number) => ({
@@ -26,6 +28,11 @@ export const useDesktopStore = create<DesktopStore>((set, get) => ({
   windows: {},
   focusedWindowId: null,
   topZIndex: 100,
+  language: 'en',
+  toggleLanguage: () => {
+    playSynthSound('click')
+    set((s) => ({ language: s.language === 'en' ? 'vi' : 'en' }))
+  },
 
   openWindow: (id, title, folderId, size) => {
     playSynthSound('open')

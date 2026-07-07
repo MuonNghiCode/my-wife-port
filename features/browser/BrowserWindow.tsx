@@ -1,10 +1,12 @@
 'use client'
 import { useState } from 'react'
+import { useDesktopStore } from '@/store/desktopStore'
 import { ArrowLeft, ArrowRight, RotateCw, Home, ExternalLink, Lock, Globe } from 'lucide-react'
 import { SOCIAL_LINKS } from '@/data/portfolio'
 
 export default function BrowserWindow() {
   const linkedinLink = SOCIAL_LINKS.find(s => s.platform === 'LinkedIn')?.url || 'https://www.linkedin.com'
+  const { language } = useDesktopStore()
   
   // Browser state
   const [urlInput, setUrlInput] = useState(linkedinLink)
@@ -94,7 +96,7 @@ export default function BrowserWindow() {
           color: 'var(--text-primary)',
         }}>
           <span style={{ color: '#059669', display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Lock size={12} /> Secure
+            <Lock size={12} /> {language === 'vi' ? 'Bảo mật' : 'Secure'}
           </span>
           <span style={{ color: '#9ca3af' }}>|</span>
           <input 
@@ -145,7 +147,7 @@ export default function BrowserWindow() {
             boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
           }}
         >
-          <span>Open Link</span>
+          <span>{language === 'vi' ? 'Mở liên kết' : 'Open Link'}</span>
           <ExternalLink size={12} />
         </a>
       </div>
@@ -173,7 +175,10 @@ export default function BrowserWindow() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <Globe size={13} />
-            <span>Browsing real address: <strong style={{ fontWeight: 700 }}>{url}</strong></span>
+            <span>
+              {language === 'vi' ? 'Đang truy cập địa chỉ thực tế: ' : 'Browsing real address: '}
+              <strong style={{ fontWeight: 700 }}>{url}</strong>
+            </span>
           </div>
           <a 
             href={url}
@@ -193,7 +198,7 @@ export default function BrowserWindow() {
               boxShadow: '0 2px 4px rgba(14, 165, 233, 0.2)',
             }}
           >
-            Open in New Tab
+            {language === 'vi' ? 'Mở trong tab mới' : 'Open in New Tab'}
           </a>
         </div>
 
@@ -238,12 +243,13 @@ export default function BrowserWindow() {
               </div>
               
               <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 8px 0' }}>
-                LinkedIn Security Shield Active
+                {language === 'vi' ? 'Lá chắn Bảo mật LinkedIn kích hoạt' : 'LinkedIn Security Shield Active'}
               </h3>
               
               <p style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 440, lineHeight: 1.5, margin: '0 0 20px 0' }}>
-                For security reasons, LinkedIn does not allow its official website to be loaded inside third-party application frames (via frame blocking policies). 
-                Please click the button below to view the official profile directly on the real LinkedIn website.
+                {language === 'vi'
+                  ? 'Vì lý do bảo mật, LinkedIn không cho phép trang web chính thức tải bên trong khung ứng dụng của bên thứ ba (chính sách chống iframe). Vui lòng nhấn nút dưới đây để xem hồ sơ trực tiếp trên trang web LinkedIn thực tế.'
+                  : 'For security reasons, LinkedIn does not allow its official website to be loaded inside third-party application frames (via frame blocking policies). Please click the button below to view the official profile directly on the real LinkedIn website.'}
               </p>
               
               <a 
@@ -267,7 +273,7 @@ export default function BrowserWindow() {
                   boxShadow: '0 4px 12px rgba(10, 102, 194, 0.25)',
                 }}
               >
-                <span>View LinkedIn Profile</span>
+                <span>{language === 'vi' ? 'Xem Hồ sơ LinkedIn' : 'View LinkedIn Profile'}</span>
                 <span>➔</span>
               </a>
             </div>

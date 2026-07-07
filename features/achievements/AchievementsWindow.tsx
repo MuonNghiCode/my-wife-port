@@ -1,14 +1,20 @@
 'use client'
 import { motion } from 'framer-motion'
 import { ACHIEVEMENTS } from '@/data/portfolio'
+import { ACHIEVEMENTS_VI } from '@/data/translations'
+import { useDesktopStore } from '@/store/desktopStore'
 import { Trophy, Medal, Star, Mic } from 'lucide-react'
 
 const ICONS = [Trophy, Medal, Star, Mic]
 
 export default function AchievementsWindow() {
+  const { language } = useDesktopStore()
+  
+  const achievements = language === 'vi' ? ACHIEVEMENTS_VI : ACHIEVEMENTS
+
   return (
     <div style={{ padding: '20px 24px', fontFamily: 'var(--font-ui)', height: '100%', overflowY: 'auto', background: 'transparent' }}>
-      {ACHIEVEMENTS.map((ach, i) => {
+      {achievements.map((ach, i) => {
         const Icon = ICONS[i % ICONS.length]
         const colors = ['var(--blue-vivid)', 'var(--pink-vivid)', 'var(--lavender-bright)', 'var(--gold)']
         const bgColors = ['var(--blue-soft)', 'var(--pink-soft)', 'var(--lavender)', 'var(--gold-soft)']

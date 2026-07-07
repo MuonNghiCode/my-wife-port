@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { OWNER, SOCIAL_LINKS } from '@/data/portfolio'
+import { useDesktopStore } from '@/store/desktopStore'
 import { Send, Mail, Globe, Phone, Check, MessageSquare, ShieldCheck, ChevronLeft } from 'lucide-react'
 import { playSynthSound } from '@/store/soundStore'
 import emailjs from '@emailjs/browser'
@@ -34,10 +35,16 @@ interface Message {
 }
 
 export default function ContactWindow() {
-  const [messages, setMessages] = useState<Message[]>([
-    { id: '1', sender: 'phuong', text: "Hi there! I'm Nguyen Ngoc Phuong. Let's collaborate!" },
-    { id: '2', sender: 'phuong', text: "To start sending your message directly to my email, what is your name?" }
-  ])
+  const { language } = useDesktopStore()
+  const [messages, setMessages] = useState<Message[]>(() => {
+    return language === 'vi' ? [
+      { id: '1', sender: 'phuong', text: "Xin chào! Tôi là Nguyễn Ngọc Phương. Rất vui được kết nối!" },
+      { id: '2', sender: 'phuong', text: "Để gửi lời nhắn trực tiếp đến email của tôi, bạn tên là gì?" }
+    ] : [
+      { id: '1', sender: 'phuong', text: "Hi there! I'm Nguyen Ngoc Phuong. Let's collaborate!" },
+      { id: '2', sender: 'phuong', text: "To start sending your message directly to my email, what is your name?" }
+    ]
+  })
   const [inputValue, setInputValue] = useState('')
   const [chatStep, setChatStep] = useState(0) // 0: Name, 1: Email, 2: Subject, 3: Message, 4: Done
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' })
@@ -75,7 +82,9 @@ export default function ContactWindow() {
         setMessages(prev => [...prev, {
           id: Math.random().toString(),
           sender: 'phuong',
-          text: `Nice to meet you, ${userText}! What is your email address so I can reply?`
+          text: language === 'vi'
+            ? `Rất vui được gặp bạn, ${userText}! Địa chỉ email của bạn là gì để tôi có thể phản hồi?`
+            : `Nice to meet you, ${userText}! What is your email address so I can reply?`
         }])
       }, 700)
     } else if (chatStep === 1) {
@@ -85,7 +94,9 @@ export default function ContactWindow() {
         setMessages(prev => [...prev, {
           id: Math.random().toString(),
           sender: 'phuong',
-          text: "Got it! What is the subject of your message?"
+          text: language === 'vi'
+            ? "Tôi đã nhận được! Chủ đề tin nhắn của bạn là gì?"
+            : "Got it! What is the subject of your message?"
         }])
       }, 700)
     } else if (chatStep === 2) {
@@ -95,7 +106,9 @@ export default function ContactWindow() {
         setMessages(prev => [...prev, {
           id: Math.random().toString(),
           sender: 'phuong',
-          text: "Great. Now write your message description below. I will send it straight to my email in the background!"
+          text: language === 'vi'
+            ? "Tuyệt vời. Bây giờ hãy viết nội dung chi tiết bên dưới. Tôi sẽ gửi trực tiếp vào hòm thư của mình!"
+            : "Great. Now write your message description below. I will send it straight to my email in the background!"
         }])
       }, 700)
     } else if (chatStep === 3) {
@@ -108,7 +121,9 @@ export default function ContactWindow() {
         setMessages(prev => [...prev, {
           id: 'sending-status',
           sender: 'phuong',
-          text: "Perfect! Sending your message directly to ngocphuong070404@gmail.com..."
+          text: language === 'vi'
+            ? "Hoàn hảo! Đang gửi tin nhắn trực tiếp đến ngocphuong070404@gmail.com..."
+            : "Perfect! Sending your message directly to ngocphuong070404@gmail.com..."
         }])
       }, 500)
 
@@ -155,7 +170,9 @@ export default function ContactWindow() {
             {
               id: Math.random().toString(),
               sender: 'phuong',
-              text: "Message sent directly to my email! I have received it and will respond within 24 hours. Thank you!"
+              text: language === 'vi'
+                ? "Tin nhắn đã gửi trực tiếp đến email của tôi! Tôi sẽ xem và phản hồi lại bạn trong vòng 24 giờ. Xin cảm ơn!"
+                : "Message sent directly to my email! I have received it and will respond within 24 hours. Thank you!"
             }
           ]))
         }, 1000)
@@ -165,7 +182,9 @@ export default function ContactWindow() {
             {
               id: Math.random().toString(),
               sender: 'phuong',
-              text: "Background send failed, but you can always reach me directly at ngocphuong070404@gmail.com. Thank you!"
+              text: language === 'vi'
+                ? "Đã xảy ra lỗi trong quá trình gửi, nhưng bạn có thể liên hệ trực tiếp với tôi bất cứ lúc nào qua ngocphuong070404@gmail.com. Xin cảm ơn!"
+                : "Background send failed, but you can always reach me directly at ngocphuong070404@gmail.com. Thank you!"
             }
           ]))
         }, 1000)
@@ -174,6 +193,15 @@ export default function ContactWindow() {
   }
 
   const getPlaceholder = () => {
+    if (language === 'vi') {
+      switch (chatStep) {
+        case 0: return 'Nhập tên của bạn...'
+        case 1: return 'Nhập địa chỉ email...'
+        case 2: return 'Nhập tiêu đề lời nhắn...'
+        case 3: return 'Nhập nội dung lời nhắn...'
+        default: return 'Lời nhắn đã được gửi thành công.'
+      }
+    }
     switch (chatStep) {
       case 0: return 'Type your name...'
       case 1: return 'Type your email...'
@@ -206,7 +234,7 @@ export default function ContactWindow() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <MessageSquare size={16} color="var(--blue-vivid)" />
             <span style={{ fontSize: 12.5, fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              Conversations
+              {language === 'vi' ? 'Cuộc hội thoại' : 'Conversations'}
             </span>
           </div>
         </div>
@@ -235,9 +263,11 @@ export default function ContactWindow() {
             </div>
             <div style={{ flex: 1, overflow: 'hidden' }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {OWNER.name}
+                {OWNER.nameVi}
               </div>
-              <div style={{ fontSize: 10, color: '#10b981', fontWeight: 700 }}>Active Now</div>
+              <div style={{ fontSize: 10, color: '#10b981', fontWeight: 700 }}>
+                {language === 'vi' ? 'Đang hoạt động' : 'Active Now'}
+              </div>
             </div>
           </div>
 
@@ -246,7 +276,7 @@ export default function ContactWindow() {
           {/* Social Links */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <span style={{ fontSize: 9.5, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', paddingLeft: 8, marginBottom: 4 }}>
-              Social Channels
+              {language === 'vi' ? 'Kênh mạng xã hội' : 'Social Channels'}
             </span>
             {SOCIAL_LINKS.map(link => {
               const Icon = ICON_MAP[link.icon] ?? Globe
@@ -314,7 +344,7 @@ export default function ContactWindow() {
               fontSize: 13.5, color: '#007aff', fontWeight: 600, cursor: 'none',
             }}>
               <ChevronLeft size={18} />
-              <span>Back</span>
+              <span>{language === 'vi' ? 'Quay lại' : 'Back'}</span>
             </span>
           </div>
 
@@ -331,7 +361,7 @@ export default function ContactWindow() {
               NP
             </div>
             <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>
-              Nguyen Ngoc Phuong
+              {OWNER.nameVi}
             </span>
           </div>
 
@@ -461,10 +491,17 @@ export default function ContactWindow() {
                 onClick={() => {
                   setChatStep(0)
                   setFormData({ name: '', email: '', subject: '', message: '' })
-                  setMessages([
-                    { id: '1', sender: 'phuong', text: "Hi there! I'm Nguyen Ngoc Phuong. Let's collaborate!" },
-                    { id: '2', sender: 'phuong', text: "To start sending your message directly to my email, what is your name?" }
-                  ])
+                  if (language === 'vi') {
+                    setMessages([
+                      { id: '1', sender: 'phuong', text: "Xin chào! Tôi là Nguyễn Ngọc Phương. Rất vui được kết nối!" },
+                      { id: '2', sender: 'phuong', text: "Để gửi lời nhắn trực tiếp đến email của tôi, bạn tên là gì?" }
+                    ])
+                  } else {
+                    setMessages([
+                      { id: '1', sender: 'phuong', text: "Hi there! I'm Nguyen Ngoc Phuong. Let's collaborate!" },
+                      { id: '2', sender: 'phuong', text: "To start sending your message directly to my email, what is your name?" }
+                    ])
+                  }
                 }}
                 data-cursor="pointer"
                 style={{
@@ -472,7 +509,7 @@ export default function ContactWindow() {
                   fontSize: 11, fontWeight: 700, cursor: 'none',
                 }}
               >
-                Restart Conversation
+                {language === 'vi' ? 'Bắt đầu lại cuộc trò chuyện' : 'Restart Conversation'}
               </button>
             </div>
           )}

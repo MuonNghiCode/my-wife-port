@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -58,9 +57,14 @@
   --gradient-cool: var(--blue-bright);
 
   /* Fonts */
-  --font-ui: 'Inter', sans-serif;
-  --font-display: 'Playfair Display', serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-ui: var(--font-inter), sans-serif;
+  --font-display: var(--font-playfair-display), serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+}
+
+.lang-vi {
+  --font-ui: var(--font-be-vietnam-pro), var(--font-inter), sans-serif;
+  --font-display: var(--font-lora), var(--font-playfair-display), serif;
 }
 
 .dark {

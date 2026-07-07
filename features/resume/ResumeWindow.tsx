@@ -1,8 +1,11 @@
 'use client'
 import { Download, FileText, ExternalLink } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useDesktopStore } from '@/store/desktopStore'
 
 export default function ResumeWindow() {
+  const { language } = useDesktopStore()
+
   return (
     <div style={{
       height: '100%',
@@ -26,7 +29,7 @@ export default function ResumeWindow() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <FileText size={16} color="var(--blue-vivid)" />
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
-            Nguyen_Ngoc_Phuong_Resume.pdf
+            {language === 'vi' ? 'CV_Nguyen_Ngoc_Phuong.pdf' : 'Nguyen_Ngoc_Phuong_Resume.pdf'}
           </span>
         </div>
 
@@ -55,7 +58,7 @@ export default function ResumeWindow() {
             }}
           >
             <ExternalLink size={13} />
-            <span>Open Tab</span>
+            <span>{language === 'vi' ? 'Mở tab mới' : 'Open Tab'}</span>
           </motion.a>
 
           {/* Download button */}
@@ -81,7 +84,7 @@ export default function ResumeWindow() {
             }}
           >
             <Download size={13} />
-            <span>Download</span>
+            <span>{language === 'vi' ? 'Tải xuống' : 'Download'}</span>
           </motion.a>
         </div>
       </div>
