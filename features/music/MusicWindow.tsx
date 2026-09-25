@@ -13,10 +13,52 @@ const visualizerBars = Array.from({ length: 24 }).map(() => ({
 interface LyricLine {
   time: number
   text: string
+  pinyin?: string
+  subText?: string
 }
 
 const LYRICS_EN: Record<string, LyricLine[]> = {
+  t0: [
+    { time: 0, text: "如果爱忘了 — Qi Wei & Silence Wang", pinyin: "rú guǒ ài wàng le", subText: "[If Love Is Forgotten — Live Cover]" },
+    { time: 21, text: "总有一些话来不及说了", pinyin: "zǒng yǒu yì xiē huà lái bù jí shuō le", subText: "There is always something left unsaid" },
+    { time: 27, text: "总有一个人是心口的朱砂", pinyin: "zǒng yǒu yí gè rén shì xīn kǒu de zhū shā", subText: "There is always someone who is the cinnabar spot on the heart" },
+    { time: 33, text: "想起那些花那些傻眼泪落下", pinyin: "xiǎng qǐ nà xiē huā nà xiē shá yǎn lèi là xià", subText: "Thinking of those flowers, those silly tears fall down" },
+    { time: 38, text: "只留一句你现在好吗", pinyin: "zhǐ liú yí jù nǐ xiàn zài hǎo ma", subText: "Leaving only one question: 'How are you doing now?'" },
+    { time: 40, text: "如果爱忘了 泪不想落下", pinyin: "rú guǒ ài wàng le lèi bù xiǎng là xià", subText: "If love is forgotten, tears don't want to fall" },
+    { time: 55, text: "那些幸福啊 让她替我到达", pinyin: "nà xiē xìng fú ā ràng tā tì wǒ dào dá", subText: "Those happy moments, let her reach them for me" },
+    { time: 64, text: "如果爱懂了 承诺的代价", pinyin: "rú guǒ ài dǒng le chéng nuò de dài jià", subText: "If love understands the price of a promise" },
+    { time: 73, text: "不能给我的 请完整给她", pinyin: "bù néng gěi wǒ de qǐng wán zhěng gěi tā", subText: "What you couldn't give me, please give completely to her" },
+    { time: 86, text: "总有些牵挂 旧得像伤疤", pinyin: "zǒng yǒu xiē qiān guà jiù de xiàng shāng bā", subText: "There are always old concerns like lingering scars" },
+    { time: 94, text: "越是不碰它 越隐隐地痛在那", pinyin: "yuè shì bú pèng tā yuè yǐn yǐn dì tòng zài nà", subText: "The more you don't touch it, the more hidden the pain is" },
+    { time: 102, text: "想起你的脸颊 你的发 我不害怕", pinyin: "xiǎng nǐ de liǎn jiá nǐ de fā wǒ bú hài pà", subText: "Thinking of your cheeks, your hair, I'm not afraid" },
+    { time: 110, text: "就让时间给我们回答", pinyin: "jiù ràng shí jiān gěi wǒ men huí dá", subText: "Just let time give us the answer" },
+    { time: 119, text: "如果爱忘了 泪不想落下", pinyin: "rú guǒ ài wàng le lèi bù xiǎng là xià", subText: "If love is forgotten, tears don't want to fall" },
+    { time: 128, text: "那些幸福啊 让她替我到达", pinyin: "nà xiē xìng fú ā ràng tā tì wǒ dào dá", subText: "Those happy moments, let her reach them for me" },
+    { time: 136, text: "如果爱懂了 承诺的代价", pinyin: "rú guǒ ài dǒng le chéng nuò de dài jià", subText: "If love understands the price of a promise" },
+    { time: 145, text: "不能给我的 请完整给她", pinyin: "bù néng gěi wǒ de qǐng wán zhěng gěi tā", subText: "What you couldn't give me, please give completely to her" },
+    { time: 160, text: "我说我忘了 不痛了", pinyin: "wǒ shuō wǒ wàng le bú tòng le", subText: "I said I forgot, it doesn't hurt anymore" },
+    { time: 168, text: "那是因为太爱太懂了", pinyin: "nà shì yīn wèi tài ài tài dǒng le", subText: "That's because I loved too much and understood too well" },
+    { time: 176, text: "笑了原谅了 为你也值得", pinyin: "xiào le yuán liàng le wéi nǐ yě zhí dé", subText: "Smiling and forgiving, for you it's all worth it" },
+    { time: 185, text: "用你的快乐告诉我", pinyin: "yòng nǐ de kuài lè gào su wǒ", subText: "Tell me with your happiness" },
+    { time: 192, text: "现在放开双手是对的", pinyin: "xiàn zài fàng kāi shuāng shǒu shì duì de", subText: "Letting go of both hands now is right" },
+    { time: 200, text: "别管我得多舍不得", pinyin: "bié guǎn wǒ duō shě bù dé", subText: "Don't worry about how reluctant I am to let go" },
+    { time: 208, text: "如果爱忘了 就放他走吧", pinyin: "rú guǒ ài wàng le jiù fàng tā zǒu ba", subText: "If love is forgotten, just let him go" },
+    { time: 217, text: "那些幸福啊 让她替我到达", pinyin: "nà xiē xìng fú ā ràng tā tì wǒ dào dá", subText: "Those happy moments, let her reach them for me" },
+    { time: 226, text: "如果爱懂了 承诺的代价", pinyin: "rú guǒ ài dǒng le chéng nuò de dài jià", subText: "If love understands the price of a promise" },
+    { time: 235, text: "不能给我的 请完整给她", pinyin: "bù néng gěi wǒ de qǐng wán zhěng gěi tā", subText: "What you couldn't give me, please give completely to her" },
+    { time: 246, text: "如果爱忘了 你还记得吗", pinyin: "rú guǒ ài wàng le nǐ hái jì dé ma", subText: "If love is forgotten, do you still remember?" }
+  ],
   t1: [
+    { time: 0, text: "[Soft piano keys introducing the melody]" },
+    { time: 12, text: "Ryuichi Sakamoto's iconic masterpiece begins" },
+    { time: 24, text: "Violins gently enter, warming the atmosphere" },
+    { time: 42, text: "A winter breeze echoes through the strings" },
+    { time: 60, text: "The piano keys dance like snowflakes" },
+    { time: 85, text: "Emotional climax: Cello and Violin harmony" },
+    { time: 110, text: "A calm, cinematic winter evening memory" },
+    { time: 140, text: "Soft piano outro fades into silence" }
+  ],
+  t2: [
     { time: 0, text: "[Chill lo-fi guitar plucking]" },
     { time: 6, text: "Can we have a coffee or something?" },
     { time: 14, text: "Wind rustling gently through the coffee shop trees" },
@@ -27,16 +69,6 @@ const LYRICS_EN: Record<string, LyricLine[]> = {
     { time: 78, text: "The aroma of fresh coffee fills the air..." },
     { time: 96, text: "Chords slowly repeat and fade away..." },
     { time: 110, text: "[Instrumental outro]" }
-  ],
-  t2: [
-    { time: 0, text: "[Soft piano keys introducing the melody]" },
-    { time: 12, text: "Ryuichi Sakamoto's iconic masterpiece begins" },
-    { time: 24, text: "Violins gently enter, warming the atmosphere" },
-    { time: 42, text: "A winter breeze echoes through the strings" },
-    { time: 60, text: "The piano keys dance like snowflakes" },
-    { time: 85, text: "Emotional climax: Cello and Violin harmony" },
-    { time: 110, text: "A calm, cinematic winter evening memory" },
-    { time: 140, text: "Soft piano outro fades into silence" }
   ],
   t3: [
     { time: 0, text: "[Orchestral string opening]" },
@@ -54,7 +86,47 @@ const LYRICS_EN: Record<string, LyricLine[]> = {
 }
 
 const LYRICS_VI: Record<string, LyricLine[]> = {
+  t0: [
+    { time: 0, text: "如果爱忘了 — 戚薇 & 汪苏泷", pinyin: "rú guǒ ài wàng le", subText: "[Nếu Em Đã Quên — Thích Tiểu Vi & Uông Tô Long]" },
+    { time: 14, text: "总有一天有些话来不及说了", pinyin: "zǒng yǒu yì xiē huà lái bù jí shuō le", subText: "Luôn có những lời chưa kịp nói ra" },
+    { time: 22, text: "总有一个人是心口的朱砂", pinyin: "zǒng yǒu yí gè rén shì xīn kǒu de zhū shā", subText: "Luôn có một người là nốt chu sa khắc sâu nơi lồng ngực" },
+    { time: 30, text: "想起那些花那些傻眼泪落下", pinyin: "xiǎng qǐ nà xiē huā nà xiē shá yǎn lèi là xià", subText: "Nhớ về những đóa hoa xưa, giọt nước mắt ngốc nghếch bỗng rơi" },
+    { time: 38, text: "只留一句你现在好吗", pinyin: "zhǐ liú yí jù nǐ xiàn zài hǎo ma", subText: "Chỉ để lại một câu: Bây giờ anh sống tốt không?" },
+    { time: 46, text: "如果爱忘了 泪不想落下", pinyin: "rú guǒ ài wàng le lèi bù xiǎng là xià", subText: "Nếu như tình yêu đã quên, nước mắt không muốn rơi xuống" },
+    { time: 55, text: "那些幸福啊 让她替我到达", pinyin: "nà xiē xìng fú ā ràng tā tì wǒ dào dá", subText: "Những hạnh phúc ấy, hãy để cô ấy thay em đón nhận" },
+    { time: 64, text: "如果爱懂了 承诺的代价", pinyin: "rú guǒ ài dǒng le chéng nuò de dài jià", subText: "Nếu tình yêu đã thấu hiểu giá trị của lời hứa" },
+    { time: 73, text: "不能给我的 请完整给她", pinyin: "bù néng gěi wǒ de qǐng wán zhěng gěi tā", subText: "Những gì không thể trao em, xin hãy trao trọn vẹn cho cô ấy" },
+    { time: 86, text: "总有些牵挂 旧得像伤疤", pinyin: "zǒng yǒu xiē qiān guà jiù de xiàng shāng bā", subText: "Luôn có những bận lòng đã cũ kỹ như vết sẹo xưa" },
+    { time: 94, text: "越是不碰它 越隐隐地痛在那", pinyin: "yuè shì bú pèng tā yuè yǐn yǐn dì tòng zài nà", subText: "Càng không chạm vào, lại càng âm ỉ đau nhói nơi đó" },
+    { time: 102, text: "想起你的脸颊 你的发 我不害怕", pinyin: "xiǎng nǐ de liǎn jiá nǐ de fā wǒ bú hài pà", subText: "Nhớ gò má anh, làn tóc anh, em không còn sợ hãi nữa" },
+    { time: 110, text: "就让时间给我们回答", pinyin: "jiù ràng shí jiān gěi wǒ men huí dá", subText: "Hãy để thời gian đưa ra câu trả lời cho chúng ta" },
+    { time: 119, text: "如果爱忘了 泪不想落下", pinyin: "rú guǒ ài wàng le lèi bù xiǎng là xià", subText: "Nếu như tình yêu đã quên, nước mắt không muốn rơi xuống" },
+    { time: 128, text: "那些幸福啊 让她替我到达", pinyin: "nà xiē xìng fú ā ràng tā tì wǒ dào dá", subText: "Những hạnh phúc ấy, hãy để cô ấy thay em đón nhận" },
+    { time: 136, text: "如果爱懂了 承诺的代价", pinyin: "rú guǒ ài dǒng le chéng nuò de dài jià", subText: "Nếu tình yêu đã thấu hiểu giá trị của lời hứa" },
+    { time: 145, text: "不能给我的 请完整给她", pinyin: "bù néng gěi wǒ de qǐng wán zhěng gěi tā", subText: "Những gì không thể trao em, xin hãy trao trọn vẹn cho cô ấy" },
+    { time: 160, text: "我说我忘了 不痛了", pinyin: "wǒ shuō wǒ wàng le bú tòng le", subText: "Em nói em đã quên rồi, không còn đau nữa" },
+    { time: 168, text: "那是因为太爱太懂了", pinyin: "nà shì yīn wèi tài ài tài dǒng le", subText: "Đó là bởi vì em quá yêu và quá thấu hiểu anh" },
+    { time: 176, text: "笑了原谅了 为你也值得", pinyin: "xiào le yuán liàng le wéi nǐ yě zhí dé", subText: "Mỉm cười tha thứ, vì anh mọi điều đều xứng đáng" },
+    { time: 185, text: "用你的快乐告诉我", pinyin: "yòng nǐ de kuài lè gào su wǒ", subText: "Hãy dùng sự hạnh phúc của anh để nói với em rằng" },
+    { time: 192, text: "现在放开双手是对的", pinyin: "xiàn zài fàng kāi shuāng shǒu shì duì de", subText: "Việc buông tay hai đứa bây giờ là điều đúng đắn" },
+    { time: 200, text: "别管我得多舍不得", pinyin: "bié guǎn wǒ duō shě bù dé", subText: "Đừng bận tâm em đã luyến tiếc nhiều đến thế nào" },
+    { time: 208, text: "如果爱忘了 就放他走吧", pinyin: "rú guǒ ài wàng le jiù fàng tā zǒu ba", subText: "Nếu như tình yêu đã quên, hãy để người ra đi" },
+    { time: 217, text: "那些幸福啊 让她替我到达", pinyin: "nà xiē xìng fú ā ràng tā tì wǒ dào dá", subText: "Những hạnh phúc ấy, hãy để cô ấy thay em đón nhận" },
+    { time: 226, text: "如果爱懂了 承诺的代价", pinyin: "rú guǒ ài dǒng le chéng nuò de dài jià", subText: "Nếu tình yêu đã thấu hiểu giá trị của lời hứa" },
+    { time: 235, text: "不能给我的 请完整给她", pinyin: "bù néng gěi wǒ de qǐng wán zhěng gěi tā", subText: "Những gì không thể trao em, xin hãy trao trọn vẹn cho cô ấy" },
+    { time: 246, text: "如果爱忘了 你还记得吗", pinyin: "rú guǒ ài wàng le nǐ hái jì dé ma", subText: "Nếu như tình yêu đã lỡ quên... anh liệu còn nhớ chăng?" }
+  ],
   t1: [
+    { time: 0, text: "[Tiếng dương cầm nhẹ nhàng dẫn dắt giai điệu]" },
+    { time: 12, text: "Tuyệt tác kinh điển của nhạc sĩ Ryuichi Sakamoto bắt đầu" },
+    { time: 24, text: "Dàn vĩ cầm hòa nhịp, sưởi ấm bầu không khí" },
+    { time: 42, text: "Làn gió đông vang vọng qua các dây đàn" },
+    { time: 60, text: "Phím đàn piano nhảy múa như những bông tuyết rơi" },
+    { time: 85, text: "Cao trào cảm xúc: Sự hòa quyện của Cello và Violin" },
+    { time: 110, text: "Ký ức đêm mùa đông yên bình, đậm chất điện ảnh" },
+    { time: 140, text: "Tiếng dương cầm dạo kết nhỏ dần vào tĩnh lặng" }
+  ],
+  t2: [
     { time: 0, text: "[Guitar lo-fi mộc mạc thư giãn]" },
     { time: 6, text: "Chúng ta có thể uống một ly cà phê hay gì đó không?" },
     { time: 14, text: "Gió thổi xào xạc qua hàng cây quán cà phê" },
@@ -65,16 +137,6 @@ const LYRICS_VI: Record<string, LyricLine[]> = {
     { time: 78, text: "Hương vị cà phê mới pha lan tỏa khắp không gian..." },
     { time: 96, text: "Các hợp âm lặp lại chậm rãi rồi nhỏ dần..." },
     { time: 110, text: "[Nhạc dạo kết thúc]" }
-  ],
-  t2: [
-    { time: 0, text: "[Tiếng dương cầm nhẹ nhàng dẫn dắt giai điệu]" },
-    { time: 12, text: "Tuyệt tác kinh điển của nhạc sĩ Ryuichi Sakamoto bắt đầu" },
-    { time: 24, text: "Dàn vĩ cầm hòa nhịp, sưởi ấm bầu không khí" },
-    { time: 42, text: "Làn gió đông vang vọng qua các dây đàn" },
-    { time: 60, text: "Phím đàn piano nhảy múa như những bông tuyết rơi" },
-    { time: 85, text: "Cao trào cảm xúc: Sự hòa quyện của Cello và Violin" },
-    { time: 110, text: "Ký ức đêm mùa đông yên bình, đậm chất điện ảnh" },
-    { time: 140, text: "Tiếng dương cầm dạo kết nhỏ dần vào tĩnh lặng" }
   ],
   t3: [
     { time: 0, text: "[Mở đầu bằng dàn dây giao hưởng]" },
@@ -125,7 +187,7 @@ export default function MusicWindow() {
     initAudioIfNeeded()
   }, [initAudioIfNeeded])
 
-  const currentTrack = TRACKS[currentTrackIdx]
+  const currentTrack = TRACKS[currentTrackIdx] || TRACKS[0]
   const lyricsData = language === 'vi' ? LYRICS_VI : LYRICS_EN
   const trackLyrics = lyricsData[currentTrack.id] || []
 
@@ -400,7 +462,7 @@ export default function MusicWindow() {
                 letterSpacing: '0.12em',
                 margin: 0,
               }}>
-                {language === 'vi' ? 'LỜI BÀI HÁT' : 'LIVE LYRICS SCRIPT'}
+                {language === 'vi' ? 'LỜI BÀI HÁT (VIETSUB / LYRICS)' : 'LIVE LYRICS SCRIPT'}
               </h3>
             </div>
 
@@ -429,15 +491,49 @@ export default function MusicWindow() {
                     }}
                     transition={{ duration: 0.3 }}
                     style={{
-                      fontSize: isActive ? 20 : 16.5,
-                      fontWeight: isActive ? 800 : 600,
-                      color: isActive ? 'var(--orange-vivid)' : 'var(--text-primary)',
-                      lineHeight: 1.5,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 3,
                       cursor: 'none',
                       transformOrigin: 'left center',
                     }}
                   >
-                    {lyric.text}
+                    {/* Pinyin Line (if present) */}
+                    {lyric.pinyin && (
+                      <span style={{
+                        fontSize: isActive ? 12.5 : 11,
+                        fontWeight: 600,
+                        color: isActive ? 'var(--orange-vivid)' : 'var(--text-muted)',
+                        opacity: 0.85,
+                        letterSpacing: '0.04em',
+                      }}>
+                        {lyric.pinyin}
+                      </span>
+                    )}
+
+                    {/* Main Chinese / Text Line */}
+                    <span style={{
+                      fontSize: isActive ? 20 : 16.5,
+                      fontWeight: isActive ? 800 : 600,
+                      color: isActive ? 'var(--orange-vivid)' : 'var(--text-primary)',
+                      lineHeight: 1.4,
+                    }}>
+                      {lyric.text}
+                    </span>
+
+                    {/* SubText / Vietnamese or English translation line (if present) */}
+                    {lyric.subText && (
+                      <span style={{
+                        fontSize: isActive ? 13.5 : 12,
+                        fontWeight: isActive ? 600 : 500,
+                        color: isActive ? 'var(--orange-vivid)' : 'var(--text-secondary)',
+                        opacity: isActive ? 0.95 : 0.7,
+                        fontStyle: 'italic',
+                        marginTop: 1,
+                      }}>
+                        {lyric.subText}
+                      </span>
+                    )}
                   </motion.div>
                 );
               })}

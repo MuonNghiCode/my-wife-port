@@ -215,11 +215,27 @@ export const EXPERIENCES_VI = [
     company: 'CellphoneS',
     narrative: 'Ứng dụng năng lực trong ngành bán lẻ thương mại điện tử. Tại CellphoneS, tôi trực tiếp lên nội dung chuẩn SEO mảng công nghệ & tài chính. Bằng cách hiểu tâm lý tìm kiếm khách hàng và tự thiết kế ảnh bài đăng, nhiều bài viết đã xuất sắc lọt Top Trending và Top Search thị trường.',
     description: [
-      'Viết bài chuẩn SEO mảng công nghệ & tài chính, nghiên cứu và chèn từ khóa tự nhiên giúp nâng thứ hạng bài viết trên Google.',
+      'Sản xuất nội dung chuẩn SEO mảng công nghệ & thiết bị điện tử tiêu dùng (bao gồm điện thoại thông minh, máy tính xách tay và các sản phẩm liên quan). Nghiên cứu chủ đề, xây dựng cấu trúc bài viết và tạo nội dung chuẩn ý định tìm kiếm (search intent) & tiêu chuẩn SEO.',
       'Đưa nhiều bài viết lên Top Trending thị trường và Top Search nhờ phát hiện các xu hướng mới và triển khai nội dung rõ ràng.',
       'Góp phần tăng lưu lượng truy cập tự nhiên (organic traffic) cho các nhóm sản phẩm bán hàng trọng điểm theo chiến dịch.',
       'Trực tiếp thiết kế và chỉnh sửa ảnh bài viết sạch đẹp, dễ nhìn, thu hút người đọc dừng chân lâu hơn.'
-    ]
+    ],
+    proof: {
+      badge: 'TOP TRENDING',
+      title: 'Các bài viết SEO tiêu biểu xuất sắc đạt Top Trending.',
+      images: [
+        '/images/cellphoneS/1.jpg',
+        '/images/cellphoneS/2.jpg',
+        '/images/cellphoneS/3.jpg',
+        '/images/cellphoneS/4.jpg'
+      ],
+      links: [
+        'https://cellphones.com.vn/macbook-pro-16-m5-max-18cpu-32-gpu-36gb-2tb.html',
+        'https://cellphones.com.vn/do-choi-cong-nghe/dong-ho-dinh-vi-tre-em.html',
+        'https://cellphones.com.vn/macbook-air-13-m5-10-cpu-8-gpu-16gb-512gb.html',
+        'https://cellphones.com.vn/macbook-neo-13-a18-pro-6-cpu-5-gpu-8gb-256gb.html'
+      ]
+    }
   }
 ]
 
@@ -228,10 +244,19 @@ export const EDUCATION_VI = {
   degree: 'Cử nhân Quản trị Kinh doanh',
   field: 'Chuyên ngành: Digital Marketing',
   activities: [
-    'Trưởng dự án "Tâm Giới" (2024)',
-    'Viết bài chuẩn SEO (Viettel & CellphoneS)',
-    'Thực hiện các chiến dịch seeding truyền thông xã hội'
-  ]
+    {
+      title: 'Trưởng dự án "Tâm Giới" (2024)',
+      subtitle: 'Chiến lược PR · Gắn kết cộng đồng · Tổ chức sự kiện',
+    },
+    {
+      title: 'Project Leader — Khóa luận tốt nghiệp MÀI',
+      subtitle: 'Quản trị dự án · Lãnh đạo nhóm · Phát triển thương hiệu',
+    },
+    {
+      title: 'Cuộc thi Torneo ACBSP — CompanyGame',
+      subtitle: 'Mô phỏng kinh doanh · Làm việc nhóm · Ra quyết định chiến lược',
+    },
+  ],
 }
 
 export const INTERESTS_VI = [

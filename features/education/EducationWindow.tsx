@@ -201,26 +201,39 @@ export default function EducationWindow() {
               </h3>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {activities?.map((act, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    padding: '10px 14px',
-                    borderRadius: 12,
-                    background: 'var(--bg-surface)',
-                    border: '1px solid var(--window-border)',
-                    fontSize: 13.5,
-                    color: 'var(--text-primary)',
-                    fontWeight: 600,
-                  }}
-                >
-                  <CheckCircle size={14} color="var(--orange-vivid)" />
-                  <span>{act}</span>
-                </div>
-              ))}
+              {activities?.map((act, idx) => {
+                const isObj = typeof act !== 'string'
+                const title = isObj ? act.title : act
+                const subtitle = isObj ? act.subtitle : undefined
+
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      padding: '12px 16px',
+                      borderRadius: 14,
+                      background: 'var(--bg-surface)',
+                      border: '1px solid var(--window-border)',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.01)',
+                    }}
+                  >
+                    <CheckCircle size={16} color="var(--orange-vivid)" style={{ marginTop: 2, flexShrink: 0 }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1 }}>
+                      <span style={{ fontSize: 13.5, color: 'var(--text-primary)', fontWeight: 700, lineHeight: 1.35 }}>
+                        {title}
+                      </span>
+                      {subtitle && (
+                        <span style={{ fontSize: 11.5, color: 'var(--text-secondary)', fontWeight: 500, lineHeight: 1.4 }}>
+                          {subtitle}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
 

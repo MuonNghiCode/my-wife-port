@@ -153,11 +153,27 @@ export const EXPERIENCES: Experience[] = [
     role: 'SEO Content Writer',
     period: '2025 — Present',
     description: [
-      "Wrote SEO articles about technology and finance, using basic SEO keywords and tools to help the website get higher rankings on Google.",
+      "Produced SEO-optimized content focused on technology and consumer electronics, including smartphones, laptops and related products. Conducted topic research, developed content structures and created articles aligned with search intent and SEO requirements.",
       "Helped many articles reach the Top Trending and Top Search pages by choosing the right topics and structuring the content clearly.",
       "Increased organic traffic for targeted product groups by writing content that matched the store's sales and promotion campaigns.",
       "Directly designed and edited images for the articles to make the posts look clean, engaging, and easy for readers to follow."
     ],
+    proof: {
+      badge: 'TOP TRENDING',
+      title: 'Selected SEO content reached Top Trending.',
+      images: [
+        '/images/cellphoneS/1.jpg',
+        '/images/cellphoneS/2.jpg',
+        '/images/cellphoneS/3.jpg',
+        '/images/cellphoneS/4.jpg'
+      ],
+      links: [
+        'https://cellphones.com.vn/macbook-pro-16-m5-max-18cpu-32-gpu-36gb-2tb.html',
+        'https://cellphones.com.vn/do-choi-cong-nghe/dong-ho-dinh-vi-tre-em.html',
+        'https://cellphones.com.vn/macbook-air-13-m5-10-cpu-8-gpu-16gb-512gb.html',
+        'https://cellphones.com.vn/macbook-neo-13-a18-pro-6-cpu-5-gpu-8gb-256gb.html'
+      ]
+    },
     technologies: ['SEO Writing', 'Keyword Research', 'Making Post Images', 'Top Search', 'Tech & Finance Content'],
   },
 ]
@@ -170,7 +186,20 @@ export const EDUCATION: Education[] = [
     field: 'Major: Digital Marketing',
     period: '2022 — 2026',
     gpa: '3.1',
-    activities: ['Led the "Tâm Giới" Project', 'SEO Content Writing (Viettel & CellphoneS)', 'Social Media & Brand Seeding Campaigns'],
+    activities: [
+      {
+        title: 'Project Leader — "Tâm Giới" Project',
+        subtitle: 'PR Strategy · Community Engagement · Event Execution',
+      },
+      {
+        title: 'Project Leader — MÀI Graduation Thesis',
+        subtitle: 'Project Management · Team Leadership · Brand Development',
+      },
+      {
+        title: 'Torneo ACBSP — CompanyGame',
+        subtitle: 'Business Simulation · Teamwork · Strategic Decision-Making',
+      },
+    ],
   },
 ]
 

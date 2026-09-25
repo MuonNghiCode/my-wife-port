@@ -52,6 +52,13 @@ export interface Skill {
   icon?: string
 }
 
+export interface ExperienceProof {
+  badge: string
+  title: string
+  images: string[]
+  links?: string[]
+}
+
 export interface Experience {
   id: string
   company: string
@@ -60,6 +67,12 @@ export interface Experience {
   description: string[]
   technologies: string[]
   logo?: string
+  proof?: ExperienceProof
+}
+
+export interface EducationActivity {
+  title: string
+  subtitle?: string
 }
 
 export interface Education {
@@ -69,7 +82,7 @@ export interface Education {
   field: string
   period: string
   gpa?: string
-  activities?: string[]
+  activities?: (string | EducationActivity)[]
 }
 
 export interface Certificate {

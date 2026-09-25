@@ -1,12 +1,36 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Building2, Calendar, CheckCircle2 } from 'lucide-react'
+import { Building2, Calendar, CheckCircle2, Flame, Eye, X, ExternalLink } from 'lucide-react'
 import { playSynthSound } from '@/store/soundStore'
 import { useDesktopStore } from '@/store/desktopStore'
 import { EXPERIENCES_VI } from '@/data/translations'
 
-const CHAPTERS_EN = [
+interface ChapterProof {
+  badge: string
+  title: string
+  images: string[]
+  links?: string[]
+}
+
+interface Chapter {
+  id: string
+  chapter: number
+  companyAbbr: string
+  role: string
+  company: string
+  period: string
+  narrative: string
+  description: string[]
+  proof?: ChapterProof
+  technologies: string[]
+  color: string
+  bg: string
+  border: string
+  badgeBg: string
+}
+
+const CHAPTERS_EN: Chapter[] = [
   {
     id: 'e1',
     chapter: 1,
@@ -56,11 +80,27 @@ const CHAPTERS_EN = [
     period: '2025 — Present',
     narrative: "Applying my skills in retail e-commerce. At CellphoneS, I wrote search-optimized articles about technology and finance. By understanding what users look for and designing the post images myself, many of my articles successfully reached Top Trending and Top Search, helping to increase website traffic.",
     description: [
-      "Wrote SEO articles about technology and finance, using basic SEO keywords and tools to help the website get higher rankings on Google.",
+      "Produced SEO-optimized content focused on technology and consumer electronics, including smartphones, laptops and related products. Conducted topic research, developed content structures and created articles aligned with search intent and SEO requirements.",
       "Helped many articles reach the Top Trending and Top Search pages by choosing the right topics and structuring the content clearly.",
       "Increased organic traffic for targeted product groups by writing content that matched the store's sales and promotion campaigns.",
       "Directly designed and edited images for the articles to make the posts look clean, engaging, and easy for readers to follow."
     ],
+    proof: {
+      badge: 'TOP TRENDING',
+      title: 'Selected SEO content reached Top Trending.',
+      images: [
+        '/images/cellphoneS/1.jpg',
+        '/images/cellphoneS/2.jpg',
+        '/images/cellphoneS/3.jpg',
+        '/images/cellphoneS/4.jpg'
+      ],
+      links: [
+        'https://cellphones.com.vn/macbook-air-13-m5-10-cpu-8-gpu-16gb-512gb.html',
+        'https://cellphones.com.vn/macbook-neo-13-a18-pro-6-cpu-5-gpu-8gb-256gb.html',
+        'https://cellphones.com.vn/macbook-pro-16-m5-max-18cpu-32-gpu-36gb-2tb.html',
+        'https://cellphones.com.vn/do-choi-cong-nghe/dong-ho-dinh-vi-tre-em.html',
+      ]
+    },
     technologies: ['SEO Writing', 'Keyword Research', 'Making Post Images', 'Top Search', 'Tech & Finance Content'],
     color: '#ef4444',
     bg: 'rgba(239, 68, 68, 0.03)',
@@ -69,7 +109,7 @@ const CHAPTERS_EN = [
   }
 ]
 
-const CHAPTERS_VI = [
+const CHAPTERS_VI: Chapter[] = [
   {
     id: 'e1',
     chapter: 1,
@@ -109,6 +149,7 @@ const CHAPTERS_VI = [
     period: '2025 — Present',
     narrative: EXPERIENCES_VI[2].narrative,
     description: EXPERIENCES_VI[2].description,
+    proof: EXPERIENCES_VI[2].proof,
     technologies: ['SEO Writing', 'Keyword Research', 'Making Post Images', 'Top Search', 'Tech & Finance Content'],
     color: '#ef4444',
     bg: 'rgba(239, 68, 68, 0.03)',
@@ -120,9 +161,28 @@ const CHAPTERS_VI = [
 export default function ExperienceWindow() {
   const { language } = useDesktopStore()
   const [activeIdx, setActiveIdx] = useState(2) // Default to latest (Chapter 3)
-  
+  const [selectedProofImg, setSelectedProofImg] = useState<string | null>(null)
+  const [autoImages, setAutoImages] = useState<string[]>([])
+
   const chapters = language === 'vi' ? CHAPTERS_VI : CHAPTERS_EN
   const currentChapter = chapters[activeIdx]
+
+  // Auto-fetch all images from /api/cellphones-images dynamically
+  useEffect(() => {
+    fetch('/api/cellphones-images')
+      .then(res => res.json())
+      .then(data => {
+        if (data.images && data.images.length > 0) {
+          setAutoImages(data.images)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  // Use dynamically loaded images if available for CellphoneS (e3)
+  const displayProofImages = (currentChapter.id === 'e3' && autoImages.length > 0)
+    ? autoImages
+    : currentChapter.proof?.images || []
 
   return (
     <div style={{
@@ -240,6 +300,197 @@ export default function ExperienceWindow() {
               </ul>
             </div>
 
+            {/* Proof / Evidence Showcase Card */}
+            {currentChapter.proof && (
+              <div style={{
+                background: 'var(--bg-surface)',
+                border: `1.5px solid ${currentChapter.color}40`,
+                borderRadius: 16,
+                padding: '18px 20px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 14,
+                marginTop: 4,
+                boxShadow: `0 4px 16px ${currentChapter.color}08`,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Flame size={15} color={currentChapter.color} />
+                    <span style={{
+                      fontSize: 11,
+                      fontWeight: 900,
+                      color: currentChapter.color,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                    }}>
+                      {currentChapter.proof.badge}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)' }}>
+                    {language === 'vi' ? 'Bằng chứng thực tế' : 'Verified Evidence'}
+                  </span>
+                </div>
+
+                <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', margin: 0, lineHeight: 1.4 }}>
+                  {currentChapter.proof.title}
+                </p>
+
+                {/* Dynamic Auto-Loaded Proof Images Grid */}
+                {displayProofImages.length > 0 && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 12, marginTop: 4 }}>
+                    {displayProofImages.map((imgSrc, imgIdx) => {
+                      const linkUrl = currentChapter.proof?.links?.[imgIdx]
+
+                      return (
+                        <div
+                          key={imgIdx}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 6,
+                          }}
+                        >
+                          <motion.div
+                            whileHover={{ scale: 1.04, y: -2 }}
+                            onClick={() => {
+                              playSynthSound('click')
+                              setSelectedProofImg(imgSrc)
+                            }}
+                            data-cursor="pointer"
+                            style={{
+                              width: '100%',
+                              height: 95,
+                              borderRadius: 12,
+                              overflow: 'hidden',
+                              border: `1.5px solid ${currentChapter.color}40`,
+                              cursor: 'none',
+                              position: 'relative',
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                              background: '#000',
+                            }}
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={imgSrc}
+                              alt={`Proof ${imgIdx + 1}`}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                            <div
+                              style={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: 'rgba(0,0,0,0.45)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 4,
+                                color: '#ffffff',
+                                fontSize: 11,
+                                fontWeight: 700,
+                                backdropFilter: 'blur(2px)',
+                                transition: 'opacity 0.2s',
+                                opacity: 0,
+                              }}
+                              onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                              onMouseLeave={e => (e.currentTarget.style.opacity = '0')}
+                            >
+                              <Eye size={14} />
+                              <span>{language === 'vi' ? 'Xem ảnh' : 'View Image'}</span>
+                            </div>
+                          </motion.div>
+
+                          {linkUrl && (
+                            <a
+                              href={linkUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              data-cursor="pointer"
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 4,
+                                fontSize: 10.5,
+                                fontWeight: 700,
+                                color: currentChapter.color,
+                                textDecoration: 'none',
+                                background: `${currentChapter.color}08`,
+                                border: `1px solid ${currentChapter.color}30`,
+                                padding: '4px 6px',
+                                borderRadius: 8,
+                                transition: 'all 0.2s',
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.background = `${currentChapter.color}20`}
+                              onMouseLeave={e => e.currentTarget.style.background = `${currentChapter.color}08`}
+                            >
+                              <span>{language === 'vi' ? 'Xem bài viết' : 'Open Link'}</span>
+                              <ExternalLink size={10} />
+                            </a>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* Dedicated External Live Articles Links Section */}
+                {currentChapter.proof.links && currentChapter.proof.links.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8, paddingTop: 12, borderTop: '1px dashed var(--window-border)' }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      {language === 'vi' ? 'Liên kết bài viết thực tế (Live Links)' : 'Live Article Links'}
+                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {currentChapter.proof.links.map((linkUrl, lIdx) => {
+                        const slug = linkUrl.split('/').pop()?.replace('.html', '') || linkUrl
+                        const cleanTitle = slug
+                          .split('-')
+                          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+                          .join(' ')
+
+                        return (
+                          <a
+                            key={lIdx}
+                            href={linkUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-cursor="pointer"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: 10,
+                              padding: '8px 12px',
+                              borderRadius: 10,
+                              background: 'var(--bg-glass)',
+                              border: '1px solid var(--window-border)',
+                              color: 'var(--text-primary)',
+                              fontSize: 12,
+                              fontWeight: 600,
+                              textDecoration: 'none',
+                              transition: 'all 0.2s ease',
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.borderColor = currentChapter.color
+                              e.currentTarget.style.color = currentChapter.color
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.borderColor = 'var(--window-border)'
+                              e.currentTarget.style.color = 'var(--text-primary)'
+                            }}
+                          >
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {lIdx + 1}. {cleanTitle}
+                            </span>
+                            <ExternalLink size={13} style={{ flexShrink: 0 }} />
+                          </a>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Technologies Footer inside card */}
             <div style={{
               display: 'flex',
@@ -322,6 +573,80 @@ export default function ExperienceWindow() {
           )
         })}
       </div>
+
+      {/* Lightbox Modal for Proof Images */}
+      <AnimatePresence>
+        {selectedProofImg && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedProofImg(null)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 99999,
+              background: 'rgba(0,0,0,0.85)',
+              backdropFilter: 'blur(10px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 24,
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              style={{
+                position: 'relative',
+                maxWidth: '90vw',
+                maxHeight: '85vh',
+                borderRadius: 20,
+                overflow: 'hidden',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+                background: '#000',
+                border: '1.5px solid var(--window-border)',
+              }}
+            >
+              <button
+                onClick={() => setSelectedProofImg(null)}
+                style={{
+                  position: 'absolute',
+                  top: 12,
+                  right: 12,
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  background: 'rgba(0,0,0,0.6)',
+                  color: '#fff',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'none',
+                  zIndex: 10,
+                }}
+              >
+                <X size={18} />
+              </button>
+
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={selectedProofImg}
+                alt="Proof Evidence Full"
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '85vh',
+                  objectFit: 'contain',
+                  display: 'block',
+                }}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -10,6 +10,13 @@ export interface Track {
 
 export const TRACKS: Track[] = [
   {
+    id: 't0',
+    title: 'Nếu Em Đã Quên (如果爱忘了)',
+    artist: '戚薇 & 汪苏泷 (Thích Tiểu Vi & Uông Tô Long)',
+    url: '/audio/ru_guo_ai_wang_le.mp3',
+    duration: '4:06',
+  },
+  {
     id: 't1',
     title: 'Merry Christmas Mr. Lawrence',
     artist: 'Ryuichi Sakamoto (Violin, Cello & Piano)',
