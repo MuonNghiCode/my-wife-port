@@ -39,3 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Videos
+*.mov
+*.mp4
+*.webm
+
+# Zips
+*.zip
+*.rar
+*.7z
+
+# Specific large files
+public/images/mywork/drive-download-*.zip
+public/images/mywork/genz/trailer.mov

@@ -31,9 +31,15 @@ export interface FolderData {
   defaultPosition?: { x: number; y: number }
 }
 
+export interface ProjectKeyResult {
+  title?: string
+  desc: string
+}
+
 export interface Project {
   id: string
   title: string
+  role?: string
   description: string
   longDescription: string
   technologies: string[]
@@ -43,6 +49,7 @@ export interface Project {
   images?: string[]
   category: string
   result?: string
+  keyResults?: ProjectKeyResult[]
 }
 
 export interface Skill {

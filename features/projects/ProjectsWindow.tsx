@@ -4,81 +4,101 @@ import { motion } from 'framer-motion'
 import { PROJECTS } from '@/data/portfolio'
 import { PROJECTS_VI } from '@/data/translations'
 import { useDesktopStore } from '@/store/desktopStore'
-import { ArrowLeft, Layers, Image as ImageIcon, Maximize2 } from 'lucide-react'
+import { ArrowLeft, Image as ImageIcon, Maximize2, ExternalLink, Award, CheckCircle2, Video, Play } from 'lucide-react'
 import { playSynthSound } from '@/store/soundStore'
 
-type Category = 'all' | 'campaign' | 'strategy' | 'event'
+type Category = 'all' | 'strategy' | 'heritage' | 'campaign' | 'event' | 'media'
 
 const CATEGORY_LABELS: Record<'en' | 'vi', Record<Category, string>> = {
   en: {
-    all: 'All Projects',
-    campaign: 'Integrated Campaigns',
+    all: 'All Activities',
     strategy: 'Brand Strategy',
+    heritage: 'Cultural Heritage',
+    campaign: 'Campaigns',
     event: 'Event Management',
+    media: 'Media Production',
   },
   vi: {
-    all: 'Tất cả dự án',
-    campaign: 'Chiến dịch tích hợp',
+    all: 'Tất cả hoạt động',
     strategy: 'Chiến lược thương hiệu',
+    heritage: 'Di sản & Văn hóa',
+    campaign: 'Chiến dịch',
     event: 'Quản lý sự kiện',
+    media: 'Sản xuất truyền thông',
   }
 }
 
 interface BrandStyle {
-  gradient: string
   borderColor: string
   badgeColor: string
   badgeBg: string
 }
 
 const BRAND_STYLES: Record<string, BrandStyle> = {
-  p1: { // Heineken
-    gradient: 'linear-gradient(to top, rgba(4, 106, 56, 0.98) 25%, rgba(4, 106, 56, 0.6) 75%, rgba(4, 106, 56, 0.2) 100%)',
-    borderColor: '#00b060',
-    badgeColor: '#00b060',
-    badgeBg: 'rgba(0, 176, 96, 0.15)',
+  p1: { // Sơn Mài Tư Bốn
+    borderColor: '#f59e0b',
+    badgeColor: '#fbbf24',
+    badgeBg: 'rgba(245, 158, 11, 0.18)',
   },
-  p2: { // Calvin Klein
-    gradient: 'linear-gradient(to top, rgba(28, 28, 30, 0.98) 25%, rgba(28, 28, 30, 0.6) 75%, rgba(28, 28, 30, 0.2) 100%)',
-    borderColor: '#a1a1aa',
-    badgeColor: '#a1a1aa',
-    badgeBg: 'rgba(161, 161, 170, 0.15)',
+  p2: { // Gen Z Cultural Heritage
+    borderColor: '#ec4899',
+    badgeColor: '#f472b6',
+    badgeBg: 'rgba(236, 72, 153, 0.18)',
   },
-  p3: { // Tâm Giới
-    gradient: 'linear-gradient(to top, rgba(88, 28, 135, 0.98) 25%, rgba(88, 28, 135, 0.6) 75%, rgba(88, 28, 135, 0.2) 100%)',
+  p3: { // Plastic After U
+    borderColor: '#10b981',
+    badgeColor: '#34d399',
+    badgeBg: 'rgba(16, 185, 129, 0.18)',
+  },
+  p4: { // Lê Lực Production - Họa Sắc
+    borderColor: '#8b5cf6',
+    badgeColor: '#a78bfa',
+    badgeBg: 'rgba(139, 92, 246, 0.18)',
+  },
+  p5: { // Tâm Giới
     borderColor: '#c084fc',
-    badgeColor: '#c084fc',
-    badgeBg: 'rgba(167, 139, 250, 0.15)',
-  },
-  p4: { // Bún Đậu Hồng Thương
-    gradient: 'linear-gradient(to top, rgba(234, 88, 12, 0.98) 25%, rgba(234, 88, 12, 0.6) 75%, rgba(234, 88, 12, 0.2) 100%)',
-    borderColor: '#ff7a3c',
-    badgeColor: '#ff7a3c',
-    badgeBg: 'rgba(255, 122, 60, 0.15)',
+    badgeColor: '#e879f9',
+    badgeBg: 'rgba(192, 132, 252, 0.18)',
   },
 }
 
-interface ImageCarouselProps {
-  images: string[]
+export interface MediaItem {
+  url: string
+  type: 'image' | 'video'
+  name: string
+}
+
+const PROJECT_FOLDER_KEYS: Record<string, string[]> = {
+  p1: ['sonmai', 'son mài mỹ nghệ tư bốn', 'sonmaimynghetubon'],
+  p2: ['genz', 'gen z & cultural heritage', 'gen z'],
+  p3: ['platics', 'plastic after u', 'plastic', 'plastics'],
+  p4: ['leluc', 'lê lực production — "họa sắc" short film', 'le luc production', 'leluc production'],
+  p5: ['tamgioi', 'tâm giới', 'tam gioi']
+}
+
+interface MediaCarouselProps {
+  mediaItems: MediaItem[]
   title: string
   height?: string | number
   onImageClick: (idx: number) => void
 }
 
-function ImageCarousel({ images, title, height = '100%', onImageClick }: ImageCarouselProps) {
+function MediaCarousel({ mediaItems, title, height = '100%', onImageClick }: MediaCarouselProps) {
   const [activeIdx, setActiveIdx] = useState(0)
   const { language } = useDesktopStore()
+
+  const currentMedia = mediaItems[activeIdx] || mediaItems[0]
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation()
     playSynthSound('click')
-    setActiveIdx(prev => (prev === 0 ? images.length - 1 : prev - 1))
+    setActiveIdx(prev => (prev === 0 ? mediaItems.length - 1 : prev - 1))
   }
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation()
     playSynthSound('click')
-    setActiveIdx(prev => (prev === images.length - 1 ? 0 : prev + 1))
+    setActiveIdx(prev => (prev === mediaItems.length - 1 ? 0 : prev + 1))
   }
 
   return (
@@ -86,51 +106,92 @@ function ImageCarousel({ images, title, height = '100%', onImageClick }: ImageCa
       width: '100%',
       height: height,
       position: 'relative',
-      background: '#0a0f1d',
+      background: '#070a12',
       overflow: 'hidden',
     }}>
-      {/* Current Slide Image */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={images[activeIdx]}
-        alt={`${title} - View ${activeIdx + 1}`}
-        onClick={() => onImageClick(activeIdx)}
-        data-cursor="pointer"
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          transition: 'all 0.35s ease-in-out',
-          cursor: 'none',
-        }}
-      />
+      {/* Current Slide Media (Video or Image) */}
+      {currentMedia.type === 'video' ? (
+        <video
+          key={currentMedia.url}
+          src={currentMedia.url}
+          controls
+          preload="metadata"
+          playsInline
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            background: '#000000',
+          }}
+        />
+      ) : (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          src={currentMedia.url}
+          alt={`${title} - View ${activeIdx + 1}`}
+          onClick={() => onImageClick(activeIdx)}
+          data-cursor="pointer"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            transition: 'all 0.35s ease-in-out',
+            cursor: 'none',
+          }}
+        />
+      )}
 
-      {/* Click to expand overlay hint */}
+      {/* Click to expand overlay hint for images */}
+      {currentMedia.type === 'image' && (
+        <div style={{
+          position: 'absolute',
+          bottom: 16,
+          left: 16,
+          background: 'rgba(15, 23, 42, 0.75)',
+          border: '1.5px solid rgba(255, 255, 255, 0.18)',
+          backdropFilter: 'blur(10px)',
+          color: '#ffffff',
+          fontSize: 10,
+          fontWeight: 800,
+          padding: '5px 12px',
+          borderRadius: 8,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          pointerEvents: 'none',
+          textTransform: 'uppercase',
+          letterSpacing: '0.04em',
+        }}>
+          <Maximize2 size={11} />
+          <span>{language === 'vi' ? 'Nhấn để xem ảnh lớn' : 'Click to view full image'}</span>
+        </div>
+      )}
+
+      {/* Media Status Badge */}
       <div style={{
         position: 'absolute',
-        bottom: 16,
-        left: 16,
-        background: 'rgba(15, 23, 42, 0.65)',
-        border: '1.5px solid rgba(255, 255, 255, 0.15)',
-        backdropFilter: 'blur(10px)',
+        top: 16,
+        right: 16,
+        background: 'rgba(15, 23, 42, 0.85)',
+        border: '1.5px solid rgba(255, 255, 255, 0.2)',
+        backdropFilter: 'blur(12px)',
         color: '#ffffff',
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: 800,
         padding: '5px 12px',
-        borderRadius: 8,
+        borderRadius: 10,
         display: 'flex',
         alignItems: 'center',
-        gap: 4,
-        pointerEvents: 'none',
-        textTransform: 'uppercase',
-        letterSpacing: '0.04em',
+        gap: 6,
+        zIndex: 5,
+        fontFamily: 'var(--font-ui), system-ui, sans-serif',
       }}>
-        <Maximize2 size={11} />
-        <span>{language === 'vi' ? 'Nhấn để xem ảnh lớn' : 'Click to view full image'}</span>
+        {currentMedia.type === 'video' ? <Video size={13} color="#f43f5e" /> : <ImageIcon size={13} />}
+        <span>{currentMedia.type === 'video' ? 'VIDEO TRAILER' : `${activeIdx + 1}/${mediaItems.length}`}</span>
       </div>
 
-      {/* Slide Navigation Overlay */}
-      {images.length > 1 && (
+      {/* Navigation Buttons */}
+      {mediaItems.length > 1 && (
         <>
           <button
             onClick={handlePrev}
@@ -143,8 +204,8 @@ function ImageCarousel({ images, title, height = '100%', onImageClick }: ImageCa
               width: 38,
               height: 38,
               borderRadius: '50%',
-              background: 'rgba(15, 23, 42, 0.65)',
-              border: '1.5px solid rgba(255, 255, 255, 0.15)',
+              background: 'rgba(15, 23, 42, 0.75)',
+              border: '1.5px solid rgba(255, 255, 255, 0.2)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -152,7 +213,7 @@ function ImageCarousel({ images, title, height = '100%', onImageClick }: ImageCa
               color: '#ffffff',
               fontSize: 18,
               fontWeight: 'bold',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
               zIndex: 10,
               outline: 'none',
               backdropFilter: 'blur(10px)',
@@ -171,8 +232,8 @@ function ImageCarousel({ images, title, height = '100%', onImageClick }: ImageCa
               width: 38,
               height: 38,
               borderRadius: '50%',
-              background: 'rgba(15, 23, 42, 0.65)',
-              border: '1.5px solid rgba(255, 255, 255, 0.15)',
+              background: 'rgba(15, 23, 42, 0.75)',
+              border: '1.5px solid rgba(255, 255, 255, 0.2)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -180,7 +241,7 @@ function ImageCarousel({ images, title, height = '100%', onImageClick }: ImageCa
               color: '#ffffff',
               fontSize: 18,
               fontWeight: 'bold',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
               zIndex: 10,
               outline: 'none',
               backdropFilter: 'blur(10px)',
@@ -198,13 +259,13 @@ function ImageCarousel({ images, title, height = '100%', onImageClick }: ImageCa
             display: 'flex',
             gap: 6,
             zIndex: 10,
-            background: 'rgba(15, 23, 42, 0.6)',
+            background: 'rgba(15, 23, 42, 0.7)',
             padding: '6px 12px',
             borderRadius: 20,
             backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.1)',
           }}>
-            {images.map((_, idx) => (
+            {mediaItems.map((m, idx) => (
               <div
                 key={idx}
                 onClick={(e) => {
@@ -213,54 +274,31 @@ function ImageCarousel({ images, title, height = '100%', onImageClick }: ImageCa
                   setActiveIdx(idx)
                 }}
                 style={{
-                  width: 7,
+                  width: m.type === 'video' ? 10 : 7,
                   height: 7,
-                  borderRadius: '50%',
-                  background: activeIdx === idx ? '#ffffff' : 'rgba(255, 255, 255, 0.4)',
+                  borderRadius: m.type === 'video' ? 3 : '50%',
+                  background: activeIdx === idx ? (m.type === 'video' ? '#f43f5e' : '#ffffff') : 'rgba(255, 255, 255, 0.4)',
                   cursor: 'pointer',
-                  transition: 'background-color 0.2s',
+                  transition: 'all 0.2s',
                 }}
               />
             ))}
           </div>
         </>
       )}
-
-      {/* Multi-image status badge */}
-      <div style={{
-        position: 'absolute',
-        top: 16,
-        right: 16,
-        background: 'rgba(15, 23, 42, 0.65)',
-        border: '1.5px solid rgba(255, 255, 255, 0.15)',
-        backdropFilter: 'blur(10px)',
-        color: '#ffffff',
-        fontSize: 11,
-        fontWeight: 700,
-        padding: '5px 12px',
-        borderRadius: 10,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 5,
-        zIndex: 5,
-        fontFamily: 'var(--font-ui), system-ui, sans-serif',
-      }}>
-        <ImageIcon size={12} />
-        <span>{activeIdx + 1}/{images.length}</span>
-      </div>
     </div>
   )
 }
 
 interface ProjectDetailProps {
   project: typeof PROJECTS[0]
+  mediaItems: MediaItem[]
   onBack: () => void
   isMobile: boolean
 }
 
-function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
+function ProjectDetailView({ project, mediaItems, onBack, isMobile }: ProjectDetailProps) {
   const { language } = useDesktopStore()
-  const imagesArray = project.images || [project.image]
   const brand = BRAND_STYLES[project.id] || BRAND_STYLES.p1
 
   // Lightbox View State
@@ -268,9 +306,11 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
   const [lightboxIdx, setLightboxIdx] = useState(0)
 
   const handleImageClick = (idx: number) => {
-    playSynthSound('click')
-    setLightboxIdx(idx)
-    setLightboxOpen(true)
+    if (mediaItems[idx]?.type === 'image') {
+      playSynthSound('click')
+      setLightboxIdx(idx)
+      setLightboxOpen(true)
+    }
   }
 
   return (
@@ -282,7 +322,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
       background: 'transparent',
       overflowY: isMobile ? 'auto' : 'hidden',
     }}>
-      {/* Left Panel: Massive Image Carousel Display */}
+      {/* Left Panel: Media Carousel Display */}
       <div style={{
         width: isMobile ? '100%' : '58%',
         height: isMobile ? '260px' : '100%',
@@ -303,8 +343,8 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            background: 'rgba(15, 23, 42, 0.7)',
-            border: '1.5px solid rgba(255, 255, 255, 0.18)',
+            background: 'rgba(15, 23, 42, 0.8)',
+            border: '1.5px solid rgba(255, 255, 255, 0.2)',
             borderRadius: 99,
             padding: '8px 16px',
             color: '#ffffff',
@@ -312,23 +352,23 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
             fontWeight: 800,
             backdropFilter: 'blur(12px)',
             cursor: 'none',
-            boxShadow: '0 4px 12 rgba(0,0,0,0.15)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
             fontFamily: 'var(--font-ui), system-ui, sans-serif',
           }}
         >
           <ArrowLeft size={13} />
-          <span>{language === 'vi' ? 'Quay lại' : 'Back to Grid'}</span>
+          <span>{language === 'vi' ? 'Quay lại danh sách' : 'Back to Grid'}</span>
         </button>
 
-        <ImageCarousel
-          images={imagesArray}
+        <MediaCarousel
+          mediaItems={mediaItems}
           title={project.title}
           height="100%"
           onImageClick={handleImageClick}
         />
       </div>
 
-      {/* Right Panel: Scrollable Brief Info Details */}
+      {/* Right Panel: Scrollable Activity Details */}
       <div style={{
         width: isMobile ? '100%' : '42%',
         height: isMobile ? 'auto' : '100%',
@@ -342,27 +382,46 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
       }}>
         {/* Header Block */}
         <div>
-          <span style={{
-            fontSize: 9.5,
-            fontWeight: 800,
-            color: brand.borderColor,
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            background: brand.badgeBg,
-            border: `1.5px solid ${brand.borderColor}30`,
-            padding: '4px 10px',
-            borderRadius: 8,
-            fontFamily: 'var(--font-ui), system-ui, sans-serif',
-          }}>
-            {CATEGORY_LABELS[language][project.category as Category] || project.category}
-          </span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+            <span style={{
+              fontSize: 9.5,
+              fontWeight: 800,
+              color: brand.badgeColor,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              background: brand.badgeBg,
+              border: `1.5px solid ${brand.borderColor}40`,
+              padding: '4px 10px',
+              borderRadius: 8,
+              fontFamily: 'var(--font-ui), system-ui, sans-serif',
+            }}>
+              {CATEGORY_LABELS[language][project.category as Category] || project.category}
+            </span>
+
+            {project.role && (
+              <span style={{
+                fontSize: 9.5,
+                fontWeight: 800,
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                background: 'var(--bg-surface)',
+                border: '1.5px solid var(--window-border)',
+                padding: '4px 10px',
+                borderRadius: 8,
+                fontFamily: 'var(--font-ui), system-ui, sans-serif',
+              }}>
+                Role: {project.role}
+              </span>
+            )}
+          </div>
           
           <h2 style={{
             fontFamily: 'var(--font-ui), system-ui, -apple-system, sans-serif',
             fontSize: 20,
             fontWeight: 900,
             color: 'var(--text-primary)',
-            margin: '12px 0 6px 0',
+            margin: '6px 0 0 0',
             letterSpacing: '-0.4px',
             lineHeight: 1.25,
           }}>
@@ -370,18 +429,18 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
           </h2>
         </div>
 
-        {/* Detailed Brief Description */}
+        {/* Detailed Overview */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <h4 style={{
             fontSize: 10,
-            fontWeight: 800,
+            fontWeight: 900,
             color: 'var(--text-muted)',
             textTransform: 'uppercase',
             letterSpacing: '0.08em',
             margin: 0,
             fontFamily: 'var(--font-ui), system-ui, sans-serif',
           }}>
-            {language === 'vi' ? 'Tóm tắt chiến lược' : 'Strategic Briefing'}
+            {language === 'vi' ? 'Tổng quan dự án & Vai trò' : 'Overview & Role'}
           </h4>
           <p style={{
             fontSize: 13,
@@ -394,33 +453,83 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
           </p>
         </div>
 
-        {/* Results Highlight Box */}
-        {project.result && (
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.02)',
-            borderLeft: `4px solid ${brand.borderColor}`,
-            borderRadius: '0 16px 16px 0',
-            padding: '14px 18px',
-            fontSize: 13,
-            color: 'var(--text-secondary)',
-            lineHeight: 1.55,
-            fontFamily: 'var(--font-ui), system-ui, sans-serif',
-          }}>
-            <strong style={{
-              display: 'block',
-              color: brand.borderColor,
+        {/* Key Results Section */}
+        {project.keyResults && project.keyResults.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <h4 style={{
               fontSize: 10,
+              fontWeight: 900,
+              color: brand.borderColor,
               textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              marginBottom: 4,
+              letterSpacing: '0.08em',
+              margin: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
             }}>
-              {language === 'vi' ? 'Kết quả & Thành quả chính' : 'Outcomes & Key Deliverables'}
-            </strong>
-            {project.result}
+              <Award size={13} color={brand.borderColor} />
+              <span>{language === 'vi' ? 'Kết quả then chốt (Key Results)' : 'Key Results'}</span>
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {project.keyResults.map((kr, kIdx) => (
+                <div key={kIdx} style={{
+                  background: 'var(--bg-surface)',
+                  border: `1.5px solid ${brand.borderColor}30`,
+                  borderRadius: 14,
+                  padding: '12px 14px',
+                  display: 'flex',
+                  gap: 10,
+                  alignItems: 'flex-start',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.01)',
+                }}>
+                  <CheckCircle2 size={16} color={brand.borderColor} style={{ flexShrink: 0, marginTop: 2 }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1 }}>
+                    {kr.title && (
+                      <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.35 }}>
+                        {kr.title}
+                      </span>
+                    )}
+                    <span style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                      {kr.desc}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Technologies Pills */}
+        {/* Live Channel / Project Link */}
+        {project.liveUrl && (
+          <a
+            href={project.liveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-cursor="pointer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '10px 18px',
+              borderRadius: 12,
+              background: brand.badgeBg,
+              border: `1.5px solid ${brand.borderColor}`,
+              color: brand.badgeColor,
+              fontSize: 12.5,
+              fontWeight: 800,
+              textDecoration: 'none',
+              width: 'fit-content',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = `${brand.borderColor}30`}
+            onMouseLeave={e => e.currentTarget.style.background = brand.badgeBg}
+          >
+            <span>{language === 'vi' ? 'Xem kênh / Trang chính thức' : 'Visit Official Channel / Link'}</span>
+            <ExternalLink size={14} />
+          </a>
+        )}
+
+        {/* Technologies / Skills Pills */}
         <div>
           <h3 style={{
             fontSize: 10,
@@ -431,7 +540,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
             marginBottom: 10,
             fontFamily: 'var(--font-ui), system-ui, sans-serif',
           }}>
-            {language === 'vi' ? 'Công cụ Marketing' : 'Marketing Stack'}
+            {language === 'vi' ? 'Kỹ năng & Lĩnh vực' : 'Skills & Domains'}
           </h3>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {project.technologies.map(t => (
@@ -456,7 +565,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
       </div>
 
       {/* ── Full-screen Image Lightbox Overlay ── */}
-      {lightboxOpen && (
+      {lightboxOpen && mediaItems[lightboxIdx]?.type === 'image' && (
         <div style={{
           position: 'fixed',
           inset: 0,
@@ -507,7 +616,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
           {/* Full Screen Image Frame */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={imagesArray[lightboxIdx]}
+            src={mediaItems[lightboxIdx].url}
             alt="Full Screen Spec"
             style={{
               maxWidth: '90%',
@@ -520,7 +629,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
           />
 
           {/* Bottom Navigation controls */}
-          {imagesArray.length > 1 && (
+          {mediaItems.length > 1 && (
             <div style={{
               display: 'flex',
               gap: 16,
@@ -532,7 +641,7 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
                 onClick={(e) => {
                   e.stopPropagation()
                   playSynthSound('click')
-                  setLightboxIdx(prev => (prev === 0 ? imagesArray.length - 1 : prev - 1))
+                  setLightboxIdx(prev => (prev === 0 ? mediaItems.length - 1 : prev - 1))
                 }}
                 data-cursor="pointer"
                 style={{
@@ -555,14 +664,14 @@ function ProjectDetailView({ project, onBack, isMobile }: ProjectDetailProps) {
                 fontWeight: 700,
                 fontFamily: 'var(--font-ui), system-ui, sans-serif',
               }}>
-                {lightboxIdx + 1} / {imagesArray.length}
+                {lightboxIdx + 1} / {mediaItems.length}
               </span>
               
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   playSynthSound('click')
-                  setLightboxIdx(prev => (prev === imagesArray.length - 1 ? 0 : prev + 1))
+                  setLightboxIdx(prev => (prev === mediaItems.length - 1 ? 0 : prev + 1))
                 }}
                 data-cursor="pointer"
                 style={{
@@ -590,6 +699,7 @@ export default function ProjectsWindow() {
   const [filter, setFilter] = useState<Category>('all')
   const [selected, setSelected] = useState<typeof PROJECTS[0] | null>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [mediaByFolder, setMediaByFolder] = useState<Record<string, MediaItem[]>>({})
   const { language } = useDesktopStore()
 
   useEffect(() => {
@@ -601,6 +711,33 @@ export default function ProjectsWindow() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
+  // Auto-discover media files dynamically from /api/mywork-media
+  useEffect(() => {
+    fetch('/api/mywork-media')
+      .then(res => res.json())
+      .then(data => {
+        if (data.mediaByFolder) {
+          setMediaByFolder(data.mediaByFolder)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  // Helper to get media items for a project
+  const getProjectMedia = (projectId: string, fallbackImages: string[] = []): MediaItem[] => {
+    const folderKeys = PROJECT_FOLDER_KEYS[projectId] || []
+    for (const key of folderKeys) {
+      if (mediaByFolder[key] && mediaByFolder[key].length > 0) {
+        return mediaByFolder[key]
+      }
+    }
+    return fallbackImages.map(imgUrl => ({
+      url: imgUrl,
+      type: 'image',
+      name: imgUrl
+    }))
+  }
+
   // Localized projects mapping
   const projectsData = PROJECTS.map(p => {
     if (language === 'vi') {
@@ -609,9 +746,11 @@ export default function ProjectsWindow() {
         return {
           ...p,
           title: translation.title,
+          role: translation.role || p.role,
           description: translation.description,
           longDescription: translation.longDescription,
-          result: translation.result
+          result: translation.result,
+          keyResults: translation.keyResults || p.keyResults
         }
       }
     }
@@ -619,7 +758,7 @@ export default function ProjectsWindow() {
   })
 
   const filtered = projectsData.filter(p => filter === 'all' || p.category === filter)
-  const categories: Category[] = ['all', 'campaign', 'strategy', 'event']
+  const categories: Category[] = ['all', 'strategy', 'heritage', 'campaign', 'event', 'media']
 
   const handleFilterClick = (cat: Category) => {
     playSynthSound('click')
@@ -627,11 +766,17 @@ export default function ProjectsWindow() {
     setSelected(null)
   }
 
-  // Active view check: if a project is selected, load the full immersive room
+  // Active view check: if an activity is selected, load the full room
   if (selected) {
+    const selectedMedia = getProjectMedia(selected.id, selected.images || [selected.image])
     return (
       <div style={{ height: '100%', background: 'transparent' }}>
-        <ProjectDetailView project={selected} onBack={() => setSelected(null)} isMobile={isMobile} />
+        <ProjectDetailView
+          project={selected}
+          mediaItems={selectedMedia}
+          onBack={() => setSelected(null)}
+          isMobile={isMobile}
+        />
       </div>
     )
   }
@@ -681,7 +826,7 @@ export default function ProjectsWindow() {
         ))}
       </div>
 
-      {/* ── Interactive Campaign Exhibition 2x2 Grid ── */}
+      {/* ── Interactive Activities Exhibition Grid ── */}
       <div style={{
         flex: 1,
         overflowY: 'auto',
@@ -698,6 +843,13 @@ export default function ProjectsWindow() {
           }}>
             {filtered.map((project, i) => {
               const brand = BRAND_STYLES[project.id] || BRAND_STYLES.p1
+              const projectMedia = getProjectMedia(project.id, project.images || [project.image])
+              
+              // Pick cover image (prefer static image over raw video for clean card thumbnail)
+              const imageMedia = projectMedia.find(m => m.type === 'image')
+              const hasVideo = projectMedia.some(m => m.type === 'video')
+              const coverUrl = imageMedia?.url || project.image
+
               return (
                 <motion.div
                   key={project.id}
@@ -712,22 +864,22 @@ export default function ProjectsWindow() {
                     setSelected(project)
                   }}
                   style={{
-                    background: '#0a0f1d',
-                    border: `1.5px solid ${brand.borderColor}30`,
+                    background: '#0f172a', // Deep Slate Dark Glass
+                    border: `1.5px solid ${brand.borderColor}40`,
                     borderRadius: 20,
                     overflow: 'hidden',
                     cursor: 'none',
-                    boxShadow: 'var(--window-shadow)',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.12)',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    height: 260, // Increased height from 200 to 260 to show much larger preview images
-                    padding: 24,
+                    height: 250,
+                    padding: '20px 24px',
                     color: '#ffffff',
                     position: 'relative',
                   }}
                 >
-                  {/* Full-bleed Project Image Background */}
+                  {/* Crisp Cover Image Background */}
                   <div style={{
                     position: 'absolute',
                     inset: 0,
@@ -735,7 +887,7 @@ export default function ProjectsWindow() {
                   }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={project.image}
+                      src={coverUrl}
                       alt={project.title}
                       style={{
                         width: '100%',
@@ -743,53 +895,78 @@ export default function ProjectsWindow() {
                         objectFit: 'cover',
                       }}
                     />
-                    {/* Translucent Brand Gradient Overlay */}
+                    {/* Ultra-clean Dark Vignette Gradient for 100% Readability */}
                     <div style={{
                       position: 'absolute',
                       inset: 0,
-                      background: brand.gradient,
+                      background: 'linear-gradient(to top, rgba(15, 23, 42, 0.96) 0%, rgba(15, 23, 42, 0.6) 55%, rgba(15, 23, 42, 0.25) 100%)',
                     }} />
                   </div>
 
-                  {/* Top row: Category Badge */}
-                  <div style={{ alignSelf: 'flex-start', zIndex: 2 }}>
+                  {/* Top row: High-contrast Category & Video Badge */}
+                  <div style={{ alignSelf: 'flex-start', zIndex: 2, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     <span style={{
-                      fontSize: 9.5,
-                      fontWeight: 800,
-                      color: brand.borderColor,
+                      fontSize: 10,
+                      fontWeight: 900,
+                      color: brand.badgeColor,
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em',
-                      background: brand.badgeBg,
-                      border: `1.5px solid ${brand.borderColor}35`,
+                      background: 'rgba(15, 23, 42, 0.85)',
+                      border: `1.5px solid ${brand.borderColor}60`,
                       padding: '4px 10px',
                       borderRadius: 8,
+                      backdropFilter: 'blur(8px)',
                       fontFamily: 'var(--font-ui), system-ui, sans-serif',
                     }}>
                       {CATEGORY_LABELS[language][project.category as Category] || project.category}
                     </span>
+
+                    {hasVideo && (
+                      <span style={{
+                        fontSize: 10,
+                        fontWeight: 900,
+                        color: '#ffffff',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                        background: 'rgba(244, 63, 94, 0.85)',
+                        border: '1.5px solid rgba(244, 63, 94, 0.9)',
+                        padding: '4px 10px',
+                        borderRadius: 8,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        backdropFilter: 'blur(8px)',
+                        fontFamily: 'var(--font-ui), system-ui, sans-serif',
+                        boxShadow: '0 2px 8px rgba(244, 63, 94, 0.3)',
+                      }}>
+                        <Play size={10} fill="#ffffff" />
+                        <span>VIDEO</span>
+                      </span>
+                    )}
                   </div>
 
                   {/* Bottom row: Info brief */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6, zIndex: 2 }}>
                     <h3 style={{
                       fontFamily: 'var(--font-ui), system-ui, -apple-system, sans-serif',
-                      fontSize: 16,
+                      fontSize: 16.5,
                       fontWeight: 900,
                       color: '#ffffff',
                       margin: 0,
                       letterSpacing: '-0.3px',
-                      textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                      textShadow: '0 2px 6px rgba(0,0,0,0.5)',
+                      lineHeight: 1.3,
                     }}>
                       {project.title}
                     </h3>
                     
                     <p style={{
                       fontFamily: 'var(--font-ui), system-ui, sans-serif',
-                      fontSize: 11.5,
-                      color: 'rgba(255, 255, 255, 0.85)',
+                      fontSize: 12,
+                      color: 'rgba(241, 245, 249, 0.88)',
                       lineHeight: 1.45,
                       margin: 0,
-                      textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                      textShadow: '0 1px 3px rgba(0,0,0,0.5)',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       display: '-webkit-box',
@@ -798,19 +975,6 @@ export default function ProjectsWindow() {
                     }}>
                       {project.description}
                     </p>
-
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
-                      {project.technologies.slice(0, 3).map(t => (
-                        <span key={t} style={{
-                          fontSize: 9.5,
-                          fontWeight: 700,
-                          color: 'rgba(255, 255, 255, 0.5)',
-                          fontFamily: 'var(--font-ui), system-ui, sans-serif',
-                        }}>
-                          #{t.replace(/\s+/g, '')}
-                        </span>
-                      ))}
-                    </div>
                   </div>
                 </motion.div>
               )
@@ -818,23 +982,20 @@ export default function ProjectsWindow() {
           </div>
         ) : (
           <div style={{
-            flex: 1,
             display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
+            height: '100%',
             color: 'var(--text-muted)',
-            fontSize: 12.5,
-            gap: 8,
-            padding: 48,
+            fontSize: 14,
+            fontWeight: 600,
           }}>
-            <Layers size={24} />
-            <span>{language === 'vi' ? 'Không tìm thấy dự án nào trong mục này.' : 'No campaigns found in this category.'}</span>
+            {language === 'vi' ? 'Không có hoạt động nào trong danh mục này.' : 'No activities found in this category.'}
           </div>
         )}
       </div>
 
-      {/* Styled Responsive Media Layout Rules */}
+      {/* Grid CSS style override for mobile responsive */}
       <style>{`
         @media (max-width: 768px) {
           .campaign-exhibition-grid {

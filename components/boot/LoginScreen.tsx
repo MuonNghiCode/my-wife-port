@@ -109,11 +109,13 @@ export default function LoginScreen() {
         >
           {/* Blurred Wallpaper Background */}
           <div style={{
-            position: 'absolute', inset: 0,
+            position: 'absolute', inset: -20,
             backgroundImage: 'url("/marketing_desktop_wallpaper.png")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
+            filter: 'blur(28px) brightness(0.85)',
+            transform: 'scale(1.08)',
           }} />
           
           {/* Frosted Glass Overlay */}

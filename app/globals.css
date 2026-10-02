@@ -1,88 +1,80 @@
 @import "tailwindcss";
 
 :root {
-  /* Crisp Light Theme Colors */
-  --bg-base: #d2e0f0;       /* Dusty pastel blue background */
-  --bg-surface: #ffffff;    /* Pure white for containers */
-  --bg-elevated: #cbd5e1;   /* Muted gray border/accent */
-  --bg-glass: rgba(255, 255, 255, 0.9);
+  /* Desktop Background Surface & Base */
+  --bg-base: #d5e0ec;       /* Soft ambient sky desktop base */
+  --bg-surface: #ffffff;    /* Pristine clean card surface */
+  --bg-elevated: #f8fafc;   /* Soft slate card background */
+  --bg-glass: rgba(255, 255, 255, 0.88);
 
-  /* Solid Pastel Pink (Accents, active states) */
-  --pink-bright: #fbcfe8;   /* Soft pink background/hover */
-  --pink-vivid: #ec4899;    /* Hot pink solid text/lines */
-  --pink-soft: #fdf2f8;
+  /* Rich Multi-Color Signature Accents */
+  --pink-bright: #fbcfe8;
+  --pink-vivid: #db2777;
+  --pink-soft: #fce7f3;
 
-  /* Solid Pastel Blue (Accents, active states) */
-  --blue-bright: #bae6fd;   /* Soft blue background/hover */
-  --blue-vivid: #0ea5e9;    /* Bright blue solid text/lines */
-  --blue-soft: #f0f9ff;
+  --blue-bright: #bae6fd;
+  --blue-vivid: #0284c7;
+  --blue-soft: #e0f2fe;
 
-  /* Theme-responsive orange (music) and green (browser) */
-  --orange-soft: #ffedd5;
-  --orange-bright: #fed7aa;
-  --orange-vivid: #f97316;
+  --orange-soft: #fef3c7;
+  --orange-bright: #fde68a;
+  --orange-vivid: #d97706;
 
-  --green-soft: #f0fdf4;
-  --green-bright: #bbf7d0;
-  --green-vivid: #22c55e;
+  --green-soft: #ecfdf5;
+  --green-bright: #a7f3d0;
+  --green-vivid: #059669;
 
-  /* Soft solid secondary colors */
-  --gold: #d97706;          /* Darker gold for readability */
-  --gold-soft: #fef3c7;
+  --gold: #d97706;
+  --gold-soft: #fffbeb;
   --lavender: #ddd6fe;
+  --lavender-soft: #f3e8ff;
   --lavender-bright: #7c3aed;
 
-  /* Text — dark for readability on light backgrounds */
-  --text-primary: #111827;   /* Slate dark gray */
-  --text-secondary: #374151; /* Dark gray */
-  --text-muted: #6b7280;     /* Muted gray */
+  /* Text — Deep Charcoal Navy for maximum crisp contrast */
+  --text-primary: #0f172a;   /* Slate 900 */
+  --text-secondary: #334155; /* Slate 700 */
+  --text-muted: #64748b;     /* Slate 500 */
   --text-accent: var(--blue-vivid);
 
-  /* Semantic colors */
-  --success: #059669;
+  /* Semantic status colors */
+  --success: #16a34a;
   --warning: #d97706;
   --error: #dc2626;
 
-  /* Window — Light Card theme */
-  --window-bg: #ffffff;
-  --window-border: #e5e7eb;
-  --window-title-bg: #f9fafb;
-  --window-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02);
-  --wallpaper-overlay: transparent;
-  --wallpaper-blur: 1.5px;
-
-  /* Solid Colors for Layouts (No gradients) */
-  --gradient-main: var(--pink-bright);
-  --gradient-warm: var(--pink-bright);
-  --gradient-cool: var(--blue-bright);
+  /* Window & Container — DISTINCT APP WINDOW vs DESKTOP */
+  --window-bg: #ffffff;      /* Pristine clean white window interior canvas */
+  --window-border: rgba(148, 163, 184, 0.45); /* Soft crisp window border */
+  --window-title-bg: #eaf0f7; /* macOS soft frosted slate title header bar */
+  --window-shadow: 0 22px 50px -10px rgba(15, 23, 42, 0.18), 0 4px 16px rgba(15, 23, 42, 0.06);
+  --wallpaper-overlay: rgba(213, 224, 236, 0.15);
+  --wallpaper-blur: 0px;     /* 100% Sharp Wallpaper */
 
   /* Fonts */
-  --font-ui: var(--font-inter), sans-serif;
-  --font-display: var(--font-playfair-display), serif;
+  --font-ui: var(--font-inter), 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display: var(--font-playfair-display), system-ui, serif;
   --font-mono: var(--font-jetbrains-mono), monospace;
 }
 
 .lang-vi {
-  --font-ui: var(--font-be-vietnam-pro), var(--font-inter), sans-serif;
-  --font-display: var(--font-lora), var(--font-playfair-display), serif;
+  --font-ui: var(--font-be-vietnam-pro), 'Plus Jakarta Sans', var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-lora), var(--font-playfair-display), system-ui, serif;
 }
 
 .dark {
-  /* Cozy Dark Theme Colors */
-  --bg-base: #182232;       /* Deep warm dusty blue background */
-  --bg-surface: #1e293b;    /* Dark slate for containers */
+  /* Cozy Dark Theme */
+  --bg-base: #0f172a;       /* Deep warm navy background */
+  --bg-surface: #1e293b;    /* Dark slate for cards */
   --bg-elevated: #334155;   /* Dark gray border/accent */
-  --bg-glass: rgba(30, 41, 59, 0.85);
+  --bg-glass: rgba(30, 41, 59, 0.92);
 
-  /* Solid Pastel Pink (Darker variation) */
-  --pink-bright: #4c283c;   /* Darker pastel pink background/hover */
+  --pink-bright: #4c283c;
+  --pink-vivid: #f472b6;
   --pink-soft: #2d1624;
 
-  /* Solid Pastel Blue (Darker variation) */
-  --blue-bright: #1b354d;   /* Darker pastel blue background/hover */
+  --blue-bright: #1b354d;
+  --blue-vivid: #38bdf8;
   --blue-soft: #102234;
 
-  /* Theme-responsive orange (music) and green (browser) dark variants */
   --orange-soft: #2c1609;
   --orange-bright: #43210b;
   --orange-vivid: #fb923c;
@@ -91,21 +83,25 @@
   --green-bright: #0b3820;
   --green-vivid: #4ade80;
 
-  /* Text — light for readability on dark backgrounds */
+  --gold: #fbbf24;
+  --gold-soft: #382405;
+  --lavender: #c084fc;
+  --lavender-soft: #2e1065;
+  --lavender-bright: #a855f7;
+
+  /* Text — light for dark theme */
   --text-primary: #f8fafc;   /* Slate light gray */
   --text-secondary: #cbd5e1; /* Light gray */
   --text-muted: #94a3b8;     /* Muted gray */
 
   /* Window — Dark theme overrides */
-  --window-bg: #1e293b;
+  --window-bg: #0b1322;      /* Deep rich dark canvas */
   --window-border: #334155;
-  --window-title-bg: #111827;
-
-  /* Wallpaper overlay */
-  --wallpaper-overlay: transparent;
-  --wallpaper-blur: 1.5px;
+  --window-title-bg: #1e293b;
+  --window-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6);
+  --wallpaper-overlay: rgba(15, 23, 42, 0.4);
+  --wallpaper-blur: 0px;
 }
-
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -129,18 +125,19 @@ body {
   width: 100vw;
   height: 100vh;
   cursor: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Custom scrollbar */
-::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(236, 72, 153, 0.25);
+  background: var(--blue-vivid);
   border-radius: 99px;
 }
 
 ::selection {
-  background: rgba(236, 72, 153, 0.2);
+  background: var(--blue-soft);
   color: var(--text-primary);
 }
 
@@ -154,7 +151,7 @@ body {
   pointer-events: none;
   z-index: 99999;
   transform: translate(-50%, -50%);
-  transition: transform 0.08s;
+  transition: transform 0.08s ease-out;
 }
 
 .cursor-ring {
@@ -169,97 +166,20 @@ body {
   transition: transform 0.14s ease-out, width 0.2s, height 0.2s, border-color 0.2s;
 }
 
-/* Animations */
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(-4deg); }
-  50% { transform: translateY(-14px) rotate(-2deg); }
-}
-
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 10px rgba(236, 72, 153, 0.1); }
-  50% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.2); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
-@keyframes scanlines {
-  0% { background-position: 0 0; }
-  100% { background-position: 0 4px; }
-}
-
-.scanlines {
-  display: none;
-}
-
-/* Glass */
-.glass {
-  background: rgba(255,255,255,0.9);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(236, 72, 153, 0.12);
-}
-
-/* Gradient text (made solid pastel for design style) */
-.gradient-text {
-  color: var(--pink-vivid);
-}
-
-/* Grain */
-.grain::after {
-  content: '';
-  position: fixed; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-  pointer-events: none; z-index: 9999;
-}
-
 @media (max-width: 768px) {
   body { overflow: hidden; }
   .cursor-dot, .cursor-ring { display: none; }
   body { cursor: auto; }
 }
 
-/* Login screen theme-responsive styles */
+/* Sleep & Login Screen Frosted Glass Background Blur */
 .login-frosted-overlay {
-  background: rgba(218, 228, 240, 0.4);
-  backdrop-filter: blur(24px) brightness(0.97);
+  background: rgba(218, 228, 240, 0.45);
+  backdrop-filter: blur(28px) brightness(0.98);
+  -webkit-backdrop-filter: blur(28px) brightness(0.98);
 }
 .dark .login-frosted-overlay {
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(24px) brightness(0.5);
-}
-
-.login-status-bar-text {
-  color: #374151;
-}
-.dark .login-status-bar-text {
-  color: #94a3b8;
-}
-
-.login-clock-text {
-  color: #0f172a;
-}
-.dark .login-clock-text {
-  color: #f1f5f9;
-}
-
-.login-date-text {
-  color: #475569;
-}
-.dark .login-date-text {
-  color: #94a3b8;
-}
-
-.login-username-text {
-  color: #1e293b;
-}
-.dark .login-username-text {
-  color: #f1f5f9;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(28px) brightness(0.5);
+  -webkit-backdrop-filter: blur(28px) brightness(0.5);
 }

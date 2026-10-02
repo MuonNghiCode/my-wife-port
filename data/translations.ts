@@ -153,31 +153,63 @@ export const ABOUT_TIMELINE_VI = [
 export const PROJECTS_VI = [
   {
     id: 'p1',
-    title: 'Chiến dịch Chiến lược Heineken',
-    description: 'Dẫn dắt chiến dịch truyền thông tích hợp "No Fears, Just Cheers" nhằm thay đổi định kiến giới về tiêu thụ bia thông qua các góc nhìn GESI.',
-    longDescription: 'Dẫn dắt đội ngũ 7 thành viên phân tích định vị thị trường và insight người tiêu dùng của Heineken. Phát triển kế hoạch truyền thông đa nền tảng toàn diện (TVC, OOH, Mạng xã hội, Sự kiện) xoay quanh Bình đẳng giới & Hòa nhập xã hội (GESI). Đồng tác giả đề xuất hợp tác thương hiệu với Dove cho chiến dịch ngày Quốc tế Phụ nữ.',
-    result: 'Trình bày thành công lộ trình IMC toàn diện, bao gồm tiến trình chiến dịch chi tiết, phân bổ ngân sách và ý tưởng TVC sáng tạo tự biên tập.',
+    title: 'Sơn Mài Mỹ Nghệ Tư Bốn (Lacquer Craftsmanship)',
+    role: 'Trưởng nhóm dự án & Liên lạc doanh nghiệp',
+    description: 'Xây dựng chiến lược thâm nhập thị trường cho doanh nghiệp sơn mài truyền thống, kết nối tư duy học thuật với thực thi doanh nghiệp.',
+    longDescription: 'Dự án khóa luận tốt nghiệp cấp đại học tập trung vào việc xây dựng chiến lược thâm nhập thị trường cho một doanh nghiệp làng nghề sơn mài truyền thống. Dự án nhằm mục đích kết nối chiến lược học thuật với thực thi doanh nghiệp, bảo tồn di sản văn hóa Việt Nam đồng thời làm cho di sản trở nên gần gũi và hấp dẫn với thế hệ Gen Z.',
+    result: 'Đạt điểm số đánh giá hàng đầu hội đồng khoa; xây dựng thành công các kênh bán hàng mới và chiến lược tung sản phẩm nhắm tới khách hàng trẻ.',
+    keyResults: [
+      { title: 'Thành tích học thuật xuất sắc', desc: 'Đạt điểm đánh giá cao nhất hội đồng bộ môn nhờ tính khả thi chiến lược cao và tác động văn hóa tích cực.' },
+      { title: 'Mở rộng thị trường & Kênh phân phối', desc: 'Xây dựng thành công các kênh tiếp cận bán hàng mới và lập chiến lược thâm nhập thị trường cho dòng sản phẩm mới nhắm tới người tiêu dùng trẻ.' }
+    ]
   },
   {
     id: 'p2',
-    title: 'Kế hoạch Tái định vị Calvin Klein',
-    description: 'Thực hiện nghiên cứu sơ cấp sâu và phân tích hành vi để cùng xây dựng chiến lược tái định vị quy mô lớn nhắm tới người tiêu dùng nam.',
-    longDescription: 'Đóng vai trò Trưởng nhóm dự án cho đội ngũ 6 thành viên. Thực hiện nghiên cứu sơ cấp quy mô lớn thông qua phỏng vấn và khảo sát để trích xuất insight khách hàng. Áp dụng các mô hình tâm lý học quyết định (Id, Ego, Superego) để giải mã hành vi mua hàng của nam giới đô thị (độ tuổi 16-50), lập tiến trình chiến dịch và phân bổ ngân sách.',
-    result: 'Đưa ra đề xuất tiếp thị toàn diện dựa trên dữ liệu xác thực từ các cơ sở dữ liệu lớn như Statista và Fragrantica để chứng minh các điểm chạm mục tiêu mới.',
+    title: 'Gen Z & Di sản Văn hóa (Dự án Chính trị FPT)',
+    role: 'Trưởng nhóm dự án & Quản lý nội dung truyền thông',
+    description: 'Làm mới các giá trị văn hóa truyền thống cho sinh viên Gen Z trong thời đại số thông qua thảo luận, podcast và triển lãm.',
+    longDescription: 'Dự án môn học chính trị chuyên biệt nhằm khơi dậy và làm mới các giá trị văn hóa truyền thống cho sinh viên Gen Z trong thời đại số. Đóng vai trò cầu nối chính giữa các giáo viên, giảng viên và sinh viên để tổ chức các buổi thảo luận tương tác và triển lãm các khái niệm di sản độc đáo.',
+    result: 'Tổ chức thành công 1 triển lãm văn hóa, chuỗi phỏng vấn sinh viên và sản xuất chuỗi podcast độc quyền cùng giảng viên.',
+    keyResults: [
+      { title: 'Triển lãm văn hóa & Chuỗi truyền thông', desc: 'Tổ chức thành công 1 triển lãm văn hóa, thực hiện chuỗi phỏng vấn sinh viên và sản xuất các tập podcast độc quyền với sự tham gia của các giảng viên.' },
+      { title: 'Tối ưu hóa kết nối', desc: 'Gắn kết hiệu quả thông tin giữa giảng viên và sinh viên, thúc đẩy sự hưởng ứng mạnh mẽ và phản hồi tích cực trên các kênh truyền thông trường.' }
+    ]
   },
   {
     id: 'p3',
-    title: 'Sự kiện Cộng đồng "Tâm Giới"',
-    description: 'Thực hiện chiến lược PR và điều phối dự án cho sự kiện cộng đồng tôn vinh sự đa dạng giới.',
-    longDescription: 'Đồng quản lý khung PR và truyền thông toàn bộ dự án để đảm bảo mức độ hiển thị cao và thông điệp nhất quán. Thiết lập và tổ chức buổi gặp gỡ cộng đồng trực tiếp nhằm tri ân và tôn vinh sự độc bản của mọi bản dạng giới.',
-    result: 'Thu hút và gắn kết thành công hơn 100+ sinh viên và khách mời đặc biệt tham gia tích cực, mang lại trải nghiệm sự kiện an toàn, trôi chảy và đầy cảm xúc.',
+    title: 'Plastic After U (Chiến dịch Môi trường)',
+    role: 'Hỗ trợ đối tác & Tài trợ',
+    description: 'Chiến dịch nâng cao nhận thức về môi trường phối hợp với các phòng ban Đại học FPT và các nhà tài trợ ngoài.',
+    longDescription: 'Chiến dịch nâng cao nhận thức về môi trường phối hợp cùng các phòng ban Đại học FPT và nhà tài trợ bên ngoài nhằm thúc đẩy lối sống xanh bền vững trong giới trẻ.',
+    result: 'Gợi mở và gọi tài trợ thành công 100% mục tiêu; thu hút hơn 200+ sinh viên tham dự phối hợp với 5+ đối tác trường đại học/cao đẳng.',
+    keyResults: [
+      { title: 'Đạt 100% Mục tiêu Tài trợ', desc: 'Thuyết trình thuyết phục và huy động thành công 100% kinh phí tài trợ mục tiêu.' },
+      { title: '200+ Sinh viên tham dự', desc: 'Điều phối vận hành sự kiện trơn tru cùng 5+ đối tác trường đại học và cao đẳng.' }
+    ]
   },
   {
     id: 'p4',
-    title: 'Tái định vị Thương hiệu Bún Đậu Hồng Thương',
-    description: 'Áp dụng mô hình STP và 7Ps để nâng cao nhận diện thương hiệu và tối ưu hóa trải nghiệm khách hàng cho một quán ăn địa phương.',
-    longDescription: 'Dẫn đầu nghiên cứu đối thủ cạnh tranh và phân tích hành vi người tiêu dùng địa phương sau khi nhà hàng chuyển địa điểm. Phát triển khung tiếp thị dịch vụ 7Ps & STP, đề xuất các chương trình giới thiệu và lịch trình nội dung mạng xã hội để tăng lưu lượng khách hàng trực tuyến lẫn trực tiếp.',
-    result: 'Xây dựng chiến lược tái định vị thương hiệu địa phương được tối ưu hóa thông qua đối chiếu dữ liệu người dùng từ ShopeeFood, BeFood và đánh giá trên Google Maps.',
+    title: 'Lê Lực Production — Phim ngắn "Họa Sắc"',
+    role: 'Trợ lý sản xuất & Trưởng bộ phận vận hành',
+    description: 'Quản lý hậu cần diễn viên, vận hành tại hiện trường và đồng dẫn dắt chiến lược ra mắt lan tỏa trên mạng xã hội cho phim ngắn "Họa Sắc".',
+    longDescription: 'Quản lý hậu cần diễn viên, vận hành trực tiếp tại hiện trường và đồng dẫn dắt chiến lược ra mắt truyền thông cho bộ phim ngắn đạt giải thưởng "Họa Sắc".',
+    result: 'Đạt giải "Đạo diễn xuất sắc nhất" tại Giải thưởng Phim sinh viên; tạo ra hơn 53,700+ lượt tiếp cận và 3,450+ tương tác.',
+    keyResults: [
+      { title: 'Đạt Giải thưởng Lớn', desc: 'Được vinh danh giải "Đạo diễn xuất sắc nhất" tại giải thưởng phim sinh viên.' },
+      { title: '53,700+ Lượt tiếp cận toàn mạng', desc: 'Tạo ra 3,450+ lượt tương tác và 1,360+ lượt xem cho bộ phim.' }
+    ]
+  },
+  {
+    id: 'p5',
+    title: 'Dự án "Tâm Giới"',
+    role: 'Quản lý dự án / Lập kế hoạch nội dung sự kiện',
+    description: 'Chuỗi sự kiện hướng tới sinh viên tôn vinh sự đa dạng bản dạng giới thông qua các chiến dịch PR và hoạt động trải nghiệm thực tế.',
+    longDescription: 'Chuỗi sự kiện hướng tới sinh viên tôn vinh sự đa dạng bản dạng giới thông qua các chiến dịch PR chiến lược và hoạt động trải nghiệm trực tiếp.',
+    result: 'Thu hút hơn 100+ người tham dự; đạt 100% tỷ lệ phê duyệt từ Đoàn thanh niên & CTSV.',
+    keyResults: [
+      { title: '100+ Người tham dự trực tiếp', desc: 'Quản lý thành công toàn bộ nội dung PR và hậu cần sự kiện từ đầu đến cuối.' },
+      { title: '100% Tỷ lệ Phê duyệt', desc: 'Hợp tác chặt chẽ với Đoàn Thanh niên & Phòng CTSV để hoàn tất phê duyệt địa điểm và truyền thông chéo.' }
+    ]
   },
 ]
 

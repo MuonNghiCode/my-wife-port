@@ -1,4 +1,5 @@
 'use client'
+
 import { useState, useEffect } from 'react'
 import { motion, useDragControls } from 'framer-motion'
 import { X, Minus, Maximize2, ChevronLeft } from 'lucide-react'
@@ -31,10 +32,10 @@ export default function Window({ window: win, children }: WindowProps) {
   const containerStyle = (win.isMaximized || isMobile)
     ? {
         position: 'fixed' as const,
-        top: isMobile ? 36 : 0,
+        top: isMobile ? 36 : 32,
         left: 0,
         right: 0,
-        bottom: isMobile ? 0 : 56,
+        bottom: 0,
         width: 'auto', height: 'auto',
         borderRadius: 0,
       }
@@ -51,12 +52,13 @@ export default function Window({ window: win, children }: WindowProps) {
     <motion.div
       layoutId={`window-${win.id}`}
       key={win.id}
-      initial={{ scale: 0.88, opacity: 0, y: 12 }}
+      initial={{ scale: 0.82, opacity: 0, y: 40 }}
       animate={win.isMinimized
-        ? { scale: 0.82, opacity: 0, y: 24, pointerEvents: 'none' as const, transitionEnd: { display: 'none' } }
+        ? { scale: 0.6, opacity: 0, y: 120, pointerEvents: 'none' as const, transitionEnd: { display: 'none' } }
         : { scale: 1, opacity: 1, y: 0, pointerEvents: 'auto' as const, display: 'flex' }
       }
-      transition={{ type: 'spring', stiffness: 350, damping: 32 }}
+      exit={{ scale: 0.8, opacity: 0, y: 30 }}
+      transition={{ type: 'spring', stiffness: 420, damping: 28, mass: 0.8 }}
       drag={!win.isMaximized && !isMobile}
       dragControls={dragControls}
       dragMomentum={false}
@@ -68,7 +70,7 @@ export default function Window({ window: win, children }: WindowProps) {
         if (!win.isMaximized) {
           updatePosition(win.id, {
             x: Math.max(0, win.position.x + info.offset.x),
-            y: Math.max(0, win.position.y + info.offset.y),
+            y: Math.max(32, win.position.y + info.offset.y),
           })
         }
       }}
@@ -76,210 +78,147 @@ export default function Window({ window: win, children }: WindowProps) {
       style={{
         ...containerStyle,
         zIndex: win.zIndex,
-        background: 'var(--bg-glass)',
-        backdropFilter: 'blur(20px)',
-        border: `1px solid ${isDragging ? 'var(--pink-vivid)' : 'var(--window-border)'}`,
-        boxShadow: isDragging
-          ? '0 16px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02)'
-          : 'var(--window-shadow)',
+        background: 'var(--window-bg)',
+        border: `1.5px solid ${isDragging ? 'var(--blue-vivid)' : 'var(--window-border)'}`,
+        boxShadow: 'var(--window-shadow)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        willChange: 'transform',
       }}
     >
-          {/* Title Bar */}
-          <div
-            onPointerDown={(e) => {
-              if (!win.isMaximized && !isMobile) {
-                dragControls.start(e)
-              }
-            }}
-            data-cursor={win.isMaximized ? 'default' : 'grab'}
-            style={{
-              height: 46,
-              background: 'var(--window-title-bg)',
-              borderBottom: '1px solid var(--window-border)',
-              display: 'flex',
-              alignItems: 'center',
-              padding: '0 14px',
-              gap: 10,
-              cursor: win.isMaximized ? 'default' : 'grab',
-              userSelect: 'none',
-              flexShrink: 0,
-            }}
-          >
-            {/* Traffic light buttons — stopPropagation on ALL events */}
-            {isMobile ? (
-              /* Mobile Header: Back Button + Centered Title + Hide Button */
-              <>
-                <button
-                  style={{
-                    background: 'none', border: 'none',
-                    display: 'flex', alignItems: 'center', gap: 2,
-                    color: 'var(--blue-vivid)', cursor: 'pointer',
-                    padding: '6px 12px 6px 0',
-                    fontFamily: 'var(--font-ui)', fontSize: 14, fontWeight: 600,
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    closeWindow(win.id)
-                  }}
-                >
-                  <ChevronLeft size={22} />
-                  <span>{UI_STRINGS[language].back}</span>
-                </button>
-                
-                <div style={{
-                  flex: 1, textAlign: 'center',
-                  fontFamily: 'var(--font-ui)', fontSize: 15, fontWeight: 700,
-                  color: 'var(--text-primary)',
-                  pointerEvents: 'none',
-                  letterSpacing: '0.01em',
-                }}>
-                  {displayTitle}
-                </div>
+      {/* Title Bar */}
+      <div
+        onPointerDown={(e) => {
+          if (!win.isMaximized && !isMobile) {
+            dragControls.start(e)
+          }
+        }}
+        data-cursor={win.isMaximized ? 'default' : 'grab'}
+        style={{
+          height: 42,
+          background: 'var(--window-title-bg)',
+          borderBottom: '1px solid var(--window-border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 14px',
+          userSelect: 'none',
+          flexShrink: 0,
+          cursor: win.isMaximized ? 'default' : 'grab',
+        }}
+      >
+        {isMobile ? (
+          /* Mobile Header */
+          <>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                closeWindow(win.id)
+              }}
+              style={{
+                background: 'none', border: 'none', color: 'var(--blue-vivid)',
+                display: 'flex', alignItems: 'center', gap: 2, fontSize: 13, fontWeight: 700,
+              }}
+            >
+              <ChevronLeft size={18} />
+              <span>{UI_STRINGS[language].back}</span>
+            </button>
+            
+            <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>
+              {displayTitle}
+            </div>
 
-                <button
-                  style={{
-                    background: 'none', border: 'none',
-                    display: 'flex', alignItems: 'center',
-                    color: 'var(--blue-vivid)', cursor: 'pointer',
-                    padding: '6px 0 6px 12px',
-                    fontFamily: 'var(--font-ui)', fontSize: 14, fontWeight: 600,
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    minimizeWindow(win.id)
-                  }}
-                >
-                  <span>{UI_STRINGS[language].hide}</span>
-                </button>
-              </>
-            ) : (
-              /* Desktop Header: Traffic light buttons + Title */
-              <>
-                <div
-                  style={{ display: 'flex', gap: 7, alignItems: 'center' }}
-                  onPointerDown={e => e.stopPropagation()}
-                >
-                  {/* Close */}
-                  <button
-                    style={{
-                      width: 14, height: 14, borderRadius: '50%',
-                      background: 'rgba(252,165,165,0.75)',
-                      border: '1px solid rgba(239,68,68,0.35)',
-                      cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      padding: 0, flexShrink: 0,
-                      transition: 'background 0.15s, transform 0.1s',
-                    }}
-                    onPointerDown={(e) => {
-                      e.stopPropagation()
-                      closeWindow(win.id)
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      closeWindow(win.id)
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = '#fca5a5'
-                      e.currentTarget.style.transform = 'scale(1.15)'
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = 'rgba(252,165,165,0.75)'
-                      e.currentTarget.style.transform = 'scale(1)'
-                    }}
-                  >
-                    <X size={8} color="rgba(127,29,29,0.9)" strokeWidth={2.5} />
-                  </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                minimizeWindow(win.id)
+              }}
+              style={{
+                background: 'none', border: 'none', color: 'var(--blue-vivid)',
+                fontSize: 13, fontWeight: 700,
+              }}
+            >
+              <span>{UI_STRINGS[language].hide}</span>
+            </button>
+          </>
+        ) : (
+          /* Desktop macOS Traffic Lights Header */
+          <>
+            <div
+              style={{ display: 'flex', gap: 8, alignItems: 'center' }}
+              onPointerDown={e => e.stopPropagation()}
+            >
+              {/* Close */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  closeWindow(win.id)
+                }}
+                style={{
+                  width: 13, height: 13, borderRadius: '50%',
+                  background: '#ff5f56', border: '1px solid #e0443e',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: 0, flexShrink: 0,
+                }}
+                title="Close"
+              >
+                <X size={8} color="#4c0000" strokeWidth={3} />
+              </button>
 
-                  {/* Minimize */}
-                  <button
-                    style={{
-                      width: 14, height: 14, borderRadius: '50%',
-                      background: 'rgba(253,230,138,0.75)',
-                      border: '1px solid rgba(245,158,11,0.35)',
-                      cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      padding: 0, flexShrink: 0,
-                      transition: 'background 0.15s, transform 0.1s',
-                    }}
-                    onPointerDown={(e) => {
-                      e.stopPropagation()
-                      minimizeWindow(win.id)
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      minimizeWindow(win.id)
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = '#fde68a'
-                      e.currentTarget.style.transform = 'scale(1.15)'
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = 'rgba(253,230,138,0.75)'
-                      e.currentTarget.style.transform = 'scale(1)'
-                    }}
-                  >
-                    <Minus size={8} color="rgba(120,53,15,0.9)" strokeWidth={2.5} />
-                  </button>
+              {/* Minimize */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  minimizeWindow(win.id)
+                }}
+                style={{
+                  width: 13, height: 13, borderRadius: '50%',
+                  background: '#ffbd2e', border: '1px solid #dea123',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: 0, flexShrink: 0,
+                }}
+                title="Minimize"
+              >
+                <Minus size={8} color="#543b00" strokeWidth={3} />
+              </button>
 
-                  {/* Maximize */}
-                  <button
-                    style={{
-                      width: 14, height: 14, borderRadius: '50%',
-                      background: 'rgba(187,247,208,0.75)',
-                      border: '1px solid rgba(52,211,153,0.35)',
-                      cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      padding: 0, flexShrink: 0,
-                      transition: 'background 0.15s, transform 0.1s',
-                    }}
-                    onPointerDown={(e) => {
-                      e.stopPropagation()
-                      maximizeWindow(win.id)
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      maximizeWindow(win.id)
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = '#bbf7d0'
-                      e.currentTarget.style.transform = 'scale(1.15)'
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = 'rgba(187,247,208,0.75)'
-                      e.currentTarget.style.transform = 'scale(1)'
-                    }}
-                  >
-                    <Maximize2 size={7} color="rgba(6,78,59,0.9)" strokeWidth={2.5} />
-                  </button>
-                </div>
+              {/* Maximize */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  maximizeWindow(win.id)
+                }}
+                style={{
+                  width: 13, height: 13, borderRadius: '50%',
+                  background: '#27c93f', border: '1px solid #1aab29',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: 0, flexShrink: 0,
+                }}
+                title="Expand"
+              >
+                <Maximize2 size={7} color="#053b0a" strokeWidth={3} />
+              </button>
+            </div>
 
-                {/* Title */}
-                <div style={{
-                  flex: 1, textAlign: 'center',
-                  fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 600,
-                  color: 'var(--text-primary)',
-                  pointerEvents: 'none',
-                  letterSpacing: '0.02em',
-                }}>
-                  {displayTitle}
-                </div>
+            {/* Title */}
+            <div style={{
+              flex: 1, textAlign: 'center',
+              fontSize: 12.5, fontWeight: 700,
+              color: 'var(--text-primary)',
+              letterSpacing: '-0.2px',
+            }}>
+              {displayTitle}
+            </div>
 
-                <div style={{ width: 60 }} />
-              </>
-            )}
-          </div>
+            <div style={{ width: 60 }} />
+          </>
+        )}
+      </div>
 
-          {/* Content */}
-          <div style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
-            {children}
-          </div>
-        </motion.div>
+      {/* Window Body Content */}
+      <div style={{ flex: 1, overflow: 'auto', position: 'relative', background: 'var(--window-bg)' }}>
+        {children}
+      </div>
+    </motion.div>
   )
 }
